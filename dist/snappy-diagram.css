@@ -1,0 +1,22 @@
+.snappy-diagram {
+  background-color: white;
+  border: 1px solid whitesmoke;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+.snappy-diagram .snappy-cell-box {
+  fill: #89d0ff;
+  stroke-width: 1;
+  stroke: #0099FF;
+}
+.snappy-diagram .snappy-arrow {
+  stroke: #333;
+  stroke-width: 2;
+}
+.snappy-diagram marker {
+  fill: black;
+}
+.snappy-diagram .orphan {
+  fill: #89d0ff;
+}
+
+/*# sourceMappingURL=snappy-diagram.css.map */
