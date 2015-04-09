@@ -16,7 +16,8 @@
   fill: black;
 }
 .snappy-diagram .orphan {
-  fill: #89d0ff;
+  fill: white;
+  stroke: #999;
 }
 
 /*# sourceMappingURL=snappy-diagram.css.map */

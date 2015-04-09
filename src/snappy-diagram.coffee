@@ -1,11 +1,9 @@
 class @SnappyDiagram
-  cells: []
-  arrows: []
-  cellCount: 0
-  rowCount: 0
-
   constructor: (@options = {}) ->
-    console.log '******************************************************************'
+    @cellCount = 0
+    @rowCount = 0
+    @cells = []
+    @arrows = []
 
     defaults =
       width: 1000
@@ -22,17 +20,17 @@ class @SnappyDiagram
     @markerStart = @snap.path(arrowPathString).transform('r180').marker(0, 0, 10, 10, 1, 5)
     @markerEnd = @snap.path(arrowPathString).marker(0, 0, 10, 10, 9, 5)
 
-  addCell: (cellX, cellY, attrs) ->
+  addCell: (cellX, cellY, options = {}) ->
     @cellCount = Math.max cellX + 1, @cellCount
     @rowCount = Math.max cellY + 1, @rowCount
     @cells[cellX] = [] unless @cells[cellX]?
 
-    cell = new SnappyCell(@, cellX, cellY)
+    cell = new SnappyCell(@, cellX, cellY, options)
     @cells[cellX].push cell
     cell
 
-  addArrow: (cellStart, cellEnd, options = {}) ->
-    arrow = new SnappyArrow(@, cellStart, cellEnd, options)
+  addConnector: (cellStart, cellEnd, options = {}) ->
+    arrow = new SnappyConnector(@, cellStart, cellEnd, options)
     @arrows.push arrow
     arrow
 
@@ -43,8 +41,7 @@ class @SnappyDiagram
   draw: ->
     @setDimensions()
     @drawCells()
-    @drawArrows()
-    console.log '<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>'
+    @drawConnectors()
 
   drawCells: ->
     @setDimensions()
@@ -52,14 +49,14 @@ class @SnappyDiagram
       if row?
         cell.draw() for cell in row
 
-  drawArrows: ->
+  drawConnectors: ->
     @setDimensions()
     arrow.draw() for arrow in @arrows
 
 class @SnappyCell
-  shape: 'box'
-
-  constructor: (@diagram, @cellX, @cellY, @attrs = {}) ->
+  constructor: (@diagram, @cellX, @cellY, @options = {}) ->
+    @options.shape ||= 'box'
+    @options.attrs ||= {}
     @
 
   x: -> @cellX * @diagram.cellWidth
@@ -98,8 +95,13 @@ class @SnappyCell
         x: @x() + (@diagram.cellWidth / 2)
         y: @y() + (@diagram.cellHeight / 2)
 
+  cellAttrs: (className) ->
+    attrs = @options.attrs
+    attrs.class = [@options.attrs.class, className].join(' ')
+    attrs
+
   draw: ->
-    switch @shape
+    switch @options.shape
       when 'circle' then @drawCircle()
       else @drawBox()
 
@@ -108,18 +110,16 @@ class @SnappyCell
     y = @y() + @diagram.options.cellSpacing / 2
     width = @diagram.cellWidth - @diagram.options.cellSpacing
     height = @diagram.cellHeight - @diagram.options.cellSpacing
-    console.log @attrs
-    @attrs.class = [@attrs.class, 'snappy-cell-box'].join(' ')
-    console.log @attrs
-    console.log '----------------------------------------'
-
-    @element = @diagram.snap.rect(x, y, width, height, @diagram.options.boxRadius).attr(@attrs)
+    @element = @diagram.snap.rect(x, y, width, height, @diagram.options.boxRadius).attr @cellAttrs('snappy-cell-box')
 
   drawCircle: ->
-    @attrs.class = 'snappy-cell-circle' unless @attrs.class?
-    @element = @diagram.snap.circle(cellPoint.x + (cellWidth / 2), cellPoint.y + (cellHeight / 2), radius)
+    x = @x() + @diagram.cellWidth / 2
+    y = @y() + @diagram.cellHeight / 2
+    radius = (Math.min(@diagram.cellWidth, @diagram.cellHeight) - @diagram.options.cellSpacing) / 2
 
-class @SnappyArrow
+    @element = @diagram.snap.circle(x, y, radius).attr @cellAttrs('snappy-cell-box')
+
+class @SnappyConnector
   constructor: (@diagram, @cellStart, @cellEnd, @options = {}) ->
     @
 

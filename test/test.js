@@ -15,33 +15,33 @@
 
   cell10 = diagram.addCell(1,0);
   cell11 = diagram.addCell(0,1);
-  cell12 = diagram.addCell(1,1, 'orphan');
+  cell12 = diagram.addCell(1,1, {attrs: {class: 'orphan'}, shape: 'circle'});
 
-  diagram.addArrow(cell5, cell1);
-  diagram.addArrow(cell5, cell2);
-  diagram.addArrow(cell5, cell3);
-  diagram.addArrow(cell5, cell4);
-  diagram.addArrow(cell5, cell6);
-  diagram.addArrow(cell5, cell7);
-  diagram.addArrow(cell5, cell8);
-  diagram.addArrow(cell5, cell9);
+  diagram.addConnector(cell5, cell1);
+  diagram.addConnector(cell5, cell2);
+  diagram.addConnector(cell5, cell3);
+  diagram.addConnector(cell5, cell4);
+  diagram.addConnector(cell5, cell6);
+  diagram.addConnector(cell5, cell7);
+  diagram.addConnector(cell5, cell8);
+  diagram.addConnector(cell5, cell9);
 
   diagram.draw();
 })();
 
 (function(){
-  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 0 });
+  diagram2 = new SnappyDiagram({ width: 800, height: 600, boxRadius: 0 });
 
-  cell1 = diagram.addCell(0,0);
-  cell2 = diagram.addCell(1,0);
-  cell3 = diagram.addCell(2,0);
-  cell4 = diagram.addCell(1,2);
-  cell5 = diagram.addCell(1,4);
+  dcell1 = diagram2.addCell(0,0);
+  dcell2 = diagram2.addCell(1,0);
+  dcell3 = diagram2.addCell(2,0);
+  dcell4 = diagram2.addCell(1,2);
+  dcell5 = diagram2.addCell(1,4);
 
-  diagram.addArrow(cell1, cell4, {startAnchor: 'bottom-middle'});
-  diagram.addArrow(cell2, cell4);
-  diagram.addArrow(cell3, cell4, {startAnchor: 'bottom-middle'});
-  diagram.addArrow(cell4, cell5);
+  diagram2.addConnector(dcell1, dcell4, {startAnchor: 'bottom-middle'});
+  diagram2.addConnector(dcell2, dcell4);
+  diagram2.addConnector(dcell3, dcell4, {startAnchor: 'bottom-middle'});
+  diagram2.addConnector(dcell4, dcell5);
 
-  diagram.draw();
+  diagram2.draw();
 })();

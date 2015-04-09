@@ -1,17 +1,12 @@
 (function() {
   this.SnappyDiagram = (function() {
-    SnappyDiagram.prototype.cells = [];
-
-    SnappyDiagram.prototype.arrows = [];
-
-    SnappyDiagram.prototype.cellCount = 0;
-
-    SnappyDiagram.prototype.rowCount = 0;
-
     function SnappyDiagram(options1) {
       var arrowPathString, defaults, key, value;
       this.options = options1 != null ? options1 : {};
-      console.log('******************************************************************');
+      this.cellCount = 0;
+      this.rowCount = 0;
+      this.cells = [];
+      this.arrows = [];
       defaults = {
         width: 1000,
         height: 500,
@@ -32,24 +27,27 @@
       this.markerEnd = this.snap.path(arrowPathString).marker(0, 0, 10, 10, 9, 5);
     }
 
-    SnappyDiagram.prototype.addCell = function(cellX, cellY, attrs) {
+    SnappyDiagram.prototype.addCell = function(cellX, cellY, options) {
       var cell;
+      if (options == null) {
+        options = {};
+      }
       this.cellCount = Math.max(cellX + 1, this.cellCount);
       this.rowCount = Math.max(cellY + 1, this.rowCount);
       if (this.cells[cellX] == null) {
         this.cells[cellX] = [];
       }
-      cell = new SnappyCell(this, cellX, cellY);
+      cell = new SnappyCell(this, cellX, cellY, options);
       this.cells[cellX].push(cell);
       return cell;
     };
 
-    SnappyDiagram.prototype.addArrow = function(cellStart, cellEnd, options) {
+    SnappyDiagram.prototype.addConnector = function(cellStart, cellEnd, options) {
       var arrow;
       if (options == null) {
         options = {};
       }
-      arrow = new SnappyArrow(this, cellStart, cellEnd, options);
+      arrow = new SnappyConnector(this, cellStart, cellEnd, options);
       this.arrows.push(arrow);
       return arrow;
     };
@@ -62,8 +60,7 @@
     SnappyDiagram.prototype.draw = function() {
       this.setDimensions();
       this.drawCells();
-      this.drawArrows();
-      return console.log('<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>');
+      return this.drawConnectors();
     };
 
     SnappyDiagram.prototype.drawCells = function() {
@@ -90,7 +87,7 @@
       return results;
     };
 
-    SnappyDiagram.prototype.drawArrows = function() {
+    SnappyDiagram.prototype.drawConnectors = function() {
       var arrow, i, len, ref, results;
       this.setDimensions();
       ref = this.arrows;
@@ -107,13 +104,14 @@
   })();
 
   this.SnappyCell = (function() {
-    SnappyCell.prototype.shape = 'box';
-
-    function SnappyCell(diagram, cellX1, cellY1, attrs1) {
+    function SnappyCell(diagram, cellX1, cellY1, options1) {
+      var base, base1;
       this.diagram = diagram;
       this.cellX = cellX1;
       this.cellY = cellY1;
-      this.attrs = attrs1 != null ? attrs1 : {};
+      this.options = options1 != null ? options1 : {};
+      (base = this.options).shape || (base.shape = 'box');
+      (base1 = this.options).attrs || (base1.attrs = {});
       this;
     }
 
@@ -178,8 +176,15 @@
       }
     };
 
+    SnappyCell.prototype.cellAttrs = function(className) {
+      var attrs;
+      attrs = this.options.attrs;
+      attrs["class"] = [this.options.attrs["class"], className].join(' ');
+      return attrs;
+    };
+
     SnappyCell.prototype.draw = function() {
-      switch (this.shape) {
+      switch (this.options.shape) {
         case 'circle':
           return this.drawCircle();
         default:
@@ -193,26 +198,23 @@
       y = this.y() + this.diagram.options.cellSpacing / 2;
       width = this.diagram.cellWidth - this.diagram.options.cellSpacing;
       height = this.diagram.cellHeight - this.diagram.options.cellSpacing;
-      console.log(this.attrs);
-      this.attrs["class"] = [this.attrs["class"], 'snappy-cell-box'].join(' ');
-      console.log(this.attrs);
-      console.log('----------------------------------------');
-      return this.element = this.diagram.snap.rect(x, y, width, height, this.diagram.options.boxRadius).attr(this.attrs);
+      return this.element = this.diagram.snap.rect(x, y, width, height, this.diagram.options.boxRadius).attr(this.cellAttrs('snappy-cell-box'));
     };
 
     SnappyCell.prototype.drawCircle = function() {
-      if (this.attrs["class"] == null) {
-        this.attrs["class"] = 'snappy-cell-circle';
-      }
-      return this.element = this.diagram.snap.circle(cellPoint.x + (cellWidth / 2), cellPoint.y + (cellHeight / 2), radius);
+      var radius, x, y;
+      x = this.x() + this.diagram.cellWidth / 2;
+      y = this.y() + this.diagram.cellHeight / 2;
+      radius = (Math.min(this.diagram.cellWidth, this.diagram.cellHeight) - this.diagram.options.cellSpacing) / 2;
+      return this.element = this.diagram.snap.circle(x, y, radius).attr(this.cellAttrs('snappy-cell-box'));
     };
 
     return SnappyCell;
 
   })();
 
-  this.SnappyArrow = (function() {
-    function SnappyArrow(diagram, cellStart1, cellEnd1, options1) {
+  this.SnappyConnector = (function() {
+    function SnappyConnector(diagram, cellStart1, cellEnd1, options1) {
       this.diagram = diagram;
       this.cellStart = cellStart1;
       this.cellEnd = cellEnd1;
@@ -220,7 +222,7 @@
       this;
     }
 
-    SnappyArrow.prototype.horizontalLabel = function(diff) {
+    SnappyConnector.prototype.horizontalLabel = function(diff) {
       if (diff > 0) {
         return 'left';
       } else if (diff < 0) {
@@ -230,7 +232,7 @@
       }
     };
 
-    SnappyArrow.prototype.verticalLabel = function(diff) {
+    SnappyConnector.prototype.verticalLabel = function(diff) {
       if (diff > 0) {
         return 'top';
       } else if (diff < 0) {
@@ -240,7 +242,7 @@
       }
     };
 
-    SnappyArrow.prototype.draw = function() {
+    SnappyConnector.prototype.draw = function() {
       var attrs, endAnchor, endLabel, line, startAnchor, startLabel;
       startLabel = this.options.startAnchor || [this.verticalLabel(this.cellStart.y() - this.cellEnd.y()), this.horizontalLabel(this.cellStart.x() - this.cellEnd.x())].join('-');
       endLabel = this.options.endAnchor || [this.verticalLabel(this.cellEnd.y() - this.cellStart.y()), this.horizontalLabel(this.cellEnd.x() - this.cellStart.x())].join('-');
@@ -256,7 +258,7 @@
       return line = this.diagram.snap.line(startAnchor.x, startAnchor.y, endAnchor.x, endAnchor.y).attr(attrs);
     };
 
-    return SnappyArrow;
+    return SnappyConnector;
 
   })();
 
