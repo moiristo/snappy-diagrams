@@ -104,6 +104,7 @@ class @SnappyCell
     switch @options.shape
       when 'circle' then @drawCircle()
       else @drawBox()
+    @element = @diagram.snap.g(@element, @drawText()) if @options.text
 
   drawBox: ->
     x = @x() + @diagram.options.cellSpacing / 2
@@ -116,8 +117,15 @@ class @SnappyCell
     x = @x() + @diagram.cellWidth / 2
     y = @y() + @diagram.cellHeight / 2
     radius = (Math.min(@diagram.cellWidth, @diagram.cellHeight) - @diagram.options.cellSpacing) / 2
-
     @element = @diagram.snap.circle(x, y, radius).attr @cellAttrs('snappy-cell-box')
+
+  drawText: ->
+    x = @x() + @diagram.options.cellSpacing / 2
+    y = @y() + @diagram.options.cellSpacing / 2
+    maxWidth = @diagram.cellWidth - @diagram.options.cellSpacing
+    maxHeight = @diagram.cellHeight - @diagram.options.cellSpacing
+    textElement = @diagram.snap.multitext(x, y, @options.text, maxWidth, maxHeight)
+
 
 class @SnappyConnector
   constructor: (@diagram, @cellStart, @cellEnd, @options = {}) ->
@@ -136,9 +144,10 @@ class @SnappyConnector
     startAnchor = @cellStart.anchorCoords startLabel
     endAnchor = @cellEnd.anchorCoords endLabel
 
-    attrs = {markerEnd: @diagram.markerEnd}
-    attrs.markerStart = @diagram.markerStart if @options.style == 'double'
-    attrs.class = 'snappy-arrow'
+    attrs = {}
+    attrs.markerEnd   = @diagram.markerEnd   unless @options.style == 'line'
+    attrs.markerStart = @diagram.markerStart if     @options.style == 'double'
+    attrs.class = 'snappy-connector'
 
     line = @diagram.snap.line(startAnchor.x, startAnchor.y, endAnchor.x, endAnchor.y).attr(attrs)
 

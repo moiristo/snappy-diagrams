@@ -32,13 +32,13 @@
 (function(){
   diagram2 = new SnappyDiagram({ width: 800, height: 600, boxRadius: 0 });
 
-  dcell1 = diagram2.addCell(0,0);
-  dcell2 = diagram2.addCell(1,0);
-  dcell3 = diagram2.addCell(2,0);
+  dcell1 = diagram2.addCell(0,0, { text: 'Nedforce Informatica Specialisten' });
+  dcell2 = diagram2.addCell(1,0, { text: 'National Aeronautics and Space Administration' });
+  dcell3 = diagram2.addCell(2,0, { text: 'Peder Inc.' });
   dcell4 = diagram2.addCell(1,2);
   dcell5 = diagram2.addCell(1,4);
 
-  diagram2.addConnector(dcell1, dcell4, {startAnchor: 'bottom-middle'});
+  diagram2.addConnector(dcell1, dcell4, {style: 'line', startAnchor: 'bottom-middle'});
   diagram2.addConnector(dcell2, dcell4);
   diagram2.addConnector(dcell3, dcell4, {startAnchor: 'bottom-middle'});
   diagram2.addConnector(dcell4, dcell5);

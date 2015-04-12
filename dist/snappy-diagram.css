@@ -8,12 +8,16 @@
   stroke-width: 1;
   stroke: #0099FF;
 }
-.snappy-diagram .snappy-arrow {
+.snappy-diagram .snappy-connector {
   stroke: #333;
   stroke-width: 2;
 }
 .snappy-diagram marker {
   fill: black;
+}
+.snappy-diagram text {
+  font-size: 14px;
+  font-weight: bold;
 }
 .snappy-diagram .orphan {
   fill: white;

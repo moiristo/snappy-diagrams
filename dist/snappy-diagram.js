@@ -1,4 +1,54 @@
 (function() {
+  Snap.plugin(function(Snap, Element, Paper, glob) {
+    return Paper.prototype.multitext = function(x, y, txt, maxWidth, maxHeight, attributes) {
+      var abc, bbox, currentLine, i, l, letterWidth, lines, svg, t, temp, tspans, widthSoFar, words;
+      svg = Snap();
+      abc = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      temp = svg.text(0, 0, abc);
+      temp.attr(attributes);
+      letterWidth = temp.getBBox().width / abc.length;
+      svg.remove();
+      words = txt.split(' ');
+      widthSoFar = 0;
+      currentLine = 0;
+      lines = [''];
+      i = 0;
+      while (i < words.length) {
+        l = words[i].length;
+        if (widthSoFar + l * letterWidth > maxWidth) {
+          lines.push('');
+          currentLine++;
+          widthSoFar = 0;
+        }
+        widthSoFar += l * letterWidth;
+        lines[currentLine] += words[i] + ' ';
+        i++;
+      }
+      t = this.text(x, y, lines).attr(attributes);
+      y = y + t.getBBox().height;
+      tspans = t.selectAll('tspan:nth-child(n+2)');
+      tspans.attr({
+        x: x,
+        dy: '1em'
+      });
+      bbox = t.getBBox();
+      if (bbox.width < maxWidth) {
+        x = x + (maxWidth - bbox.width) / 2;
+      }
+      if (bbox.height < maxHeight) {
+        y = y + (maxHeight - bbox.height) / 2;
+      }
+      t.attr({
+        x: x,
+        y: y
+      });
+      tspans.attr({
+        x: x
+      });
+      return t;
+    };
+  });
+
   this.SnappyDiagram = (function() {
     function SnappyDiagram(options1) {
       var arrowPathString, defaults, key, value;
@@ -64,18 +114,18 @@
     };
 
     SnappyDiagram.prototype.drawCells = function() {
-      var cell, i, len, ref, results, row;
+      var cell, j, len, ref, results, row;
       this.setDimensions();
       ref = this.cells;
       results = [];
-      for (i = 0, len = ref.length; i < len; i++) {
-        row = ref[i];
+      for (j = 0, len = ref.length; j < len; j++) {
+        row = ref[j];
         if (row != null) {
           results.push((function() {
-            var j, len1, results1;
+            var k, len1, results1;
             results1 = [];
-            for (j = 0, len1 = row.length; j < len1; j++) {
-              cell = row[j];
+            for (k = 0, len1 = row.length; k < len1; k++) {
+              cell = row[k];
               results1.push(cell.draw());
             }
             return results1;
@@ -88,12 +138,12 @@
     };
 
     SnappyDiagram.prototype.drawConnectors = function() {
-      var arrow, i, len, ref, results;
+      var arrow, j, len, ref, results;
       this.setDimensions();
       ref = this.arrows;
       results = [];
-      for (i = 0, len = ref.length; i < len; i++) {
-        arrow = ref[i];
+      for (j = 0, len = ref.length; j < len; j++) {
+        arrow = ref[j];
         results.push(arrow.draw());
       }
       return results;
@@ -186,9 +236,13 @@
     SnappyCell.prototype.draw = function() {
       switch (this.options.shape) {
         case 'circle':
-          return this.drawCircle();
+          this.drawCircle();
+          break;
         default:
-          return this.drawBox();
+          this.drawBox();
+      }
+      if (this.options.text) {
+        return this.element = this.diagram.snap.g(this.element, this.drawText());
       }
     };
 
@@ -207,6 +261,15 @@
       y = this.y() + this.diagram.cellHeight / 2;
       radius = (Math.min(this.diagram.cellWidth, this.diagram.cellHeight) - this.diagram.options.cellSpacing) / 2;
       return this.element = this.diagram.snap.circle(x, y, radius).attr(this.cellAttrs('snappy-cell-box'));
+    };
+
+    SnappyCell.prototype.drawText = function() {
+      var maxHeight, maxWidth, textElement, x, y;
+      x = this.x() + this.diagram.options.cellSpacing / 2;
+      y = this.y() + this.diagram.options.cellSpacing / 2;
+      maxWidth = this.diagram.cellWidth - this.diagram.options.cellSpacing;
+      maxHeight = this.diagram.cellHeight - this.diagram.options.cellSpacing;
+      return textElement = this.diagram.snap.multitext(x, y, this.options.text, maxWidth, maxHeight);
     };
 
     return SnappyCell;
@@ -248,13 +311,14 @@
       endLabel = this.options.endAnchor || [this.verticalLabel(this.cellEnd.y() - this.cellStart.y()), this.horizontalLabel(this.cellEnd.x() - this.cellStart.x())].join('-');
       startAnchor = this.cellStart.anchorCoords(startLabel);
       endAnchor = this.cellEnd.anchorCoords(endLabel);
-      attrs = {
-        markerEnd: this.diagram.markerEnd
-      };
+      attrs = {};
+      if (this.options.style !== 'line') {
+        attrs.markerEnd = this.diagram.markerEnd;
+      }
       if (this.options.style === 'double') {
         attrs.markerStart = this.diagram.markerStart;
       }
-      attrs["class"] = 'snappy-arrow';
+      attrs["class"] = 'snappy-connector';
       return line = this.diagram.snap.line(startAnchor.x, startAnchor.y, endAnchor.x, endAnchor.y).attr(attrs);
     };
 
