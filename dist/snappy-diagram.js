@@ -240,6 +240,10 @@
       return this.diagram.options.cellSpacing / 2;
     };
 
+    SnappyCell.prototype.circleRadius = function() {
+      return (Math.min(this.diagram.cellWidth, this.diagram.cellHeight) - this.diagram.options.cellSpacing) / 2;
+    };
+
     SnappyCell.prototype.boxXOffset = function(anchor) {
       if (['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0) {
         return this.diagram.options.boxRadius / 3 + this.spacingOffset();
@@ -257,6 +261,54 @@
         return this.parallelogramOffset() + this.spacingOffset();
       } else if (['middle-left', 'middle-right'].indexOf(anchor) >= 0) {
         return this.parallelogramOffset() / 2 + this.spacingOffset();
+      } else {
+        return this.spacingOffset();
+      }
+    };
+
+    SnappyCell.prototype.ellipseXOffset = function(anchor) {
+      if (['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0) {
+        return this.spacingOffset() + this.diagram.cellWidth * 0.1313;
+      } else {
+        return this.spacingOffset();
+      }
+    };
+
+    SnappyCell.prototype.ellipseYOffset = function(anchor) {
+      if (['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0) {
+        return this.spacingOffset() + this.diagram.cellHeight * 0.1313;
+      } else {
+        return this.spacingOffset();
+      }
+    };
+
+    SnappyCell.prototype.circleXOffset = function(anchor) {
+      var offset;
+      offset = this.spacingOffset();
+      if (this.diagram.cellWidth > this.diagram.cellHeight && ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right'].indexOf(anchor) >= 0) {
+        offset += (this.diagram.cellWidth - this.diagram.cellHeight) / 2;
+      }
+      if (['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0) {
+        offset += this.circleRadius() * 0.2626;
+      }
+      if (offset != null) {
+        return offset;
+      } else {
+        return this.spacingOffset();
+      }
+    };
+
+    SnappyCell.prototype.circleYOffset = function(anchor) {
+      var offset;
+      offset = this.spacingOffset();
+      if (this.diagram.cellHeight > this.diagram.cellWidth && ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right'].indexOf(anchor) >= 0) {
+        offset += (this.diagram.cellHeight - this.diagram.cellWidth) / 2;
+      }
+      if (['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0) {
+        offset += this.circleRadius() * 0.2626;
+      }
+      if (offset != null) {
+        return offset;
       } else {
         return this.spacingOffset();
       }
@@ -314,10 +366,9 @@
     };
 
     SnappyCell.prototype.drawCircle = function() {
-      var centerPoint, radius;
+      var centerPoint;
       centerPoint = this.centerPoint();
-      radius = (Math.min(this.diagram.cellWidth, this.diagram.cellHeight) - this.diagram.options.cellSpacing) / 2;
-      return this.element = this.diagram.snap.circle(centerPoint.x, centerPoint.y, radius).attr(this.cellAttrs('snappy-cell-box'));
+      return this.element = this.diagram.snap.circle(centerPoint.x, centerPoint.y, this.circleRadius()).attr(this.cellAttrs('snappy-cell-box'));
     };
 
     SnappyCell.prototype.drawEllipse = function() {

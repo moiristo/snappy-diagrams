@@ -109,6 +109,9 @@ class @SnappyCell
   spacingOffset: ->
     @diagram.options.cellSpacing / 2
 
+  circleRadius: ->
+    (Math.min(@diagram.cellWidth, @diagram.cellHeight) - @diagram.options.cellSpacing) / 2
+
   boxXOffset: (anchor) ->
     if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
       @diagram.options.boxRadius / 3 + @spacingOffset()
@@ -124,6 +127,34 @@ class @SnappyCell
       @parallelogramOffset() / 2 + @spacingOffset()
     else
       @spacingOffset()
+
+  ellipseXOffset: (anchor) ->
+    if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
+      @spacingOffset() + @diagram.cellWidth * 0.1313
+    else
+      @spacingOffset()
+
+  ellipseYOffset: (anchor) ->
+    if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
+      @spacingOffset() + @diagram.cellHeight * 0.1313
+    else
+      @spacingOffset()
+
+  circleXOffset: (anchor) ->
+    offset = @spacingOffset()
+    if @diagram.cellWidth > @diagram.cellHeight && ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right'].indexOf(anchor) >= 0
+      offset += (@diagram.cellWidth - @diagram.cellHeight ) / 2
+
+    offset += @circleRadius() * 0.2626 if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
+    if offset? then offset else @spacingOffset()
+
+  circleYOffset: (anchor) ->
+    offset = @spacingOffset()
+    if @diagram.cellHeight > @diagram.cellWidth && ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right'].indexOf(anchor) >= 0
+      offset += (@diagram.cellHeight - @diagram.cellWidth ) / 2
+
+    offset += @circleRadius() * 0.2626 if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
+    if offset? then offset else @spacingOffset()
 
   cellAttrs: (className) ->
     attrs = @options.attrs
@@ -157,8 +188,7 @@ class @SnappyCell
 
   drawCircle: ->
     centerPoint = @centerPoint()
-    radius = (Math.min(@diagram.cellWidth, @diagram.cellHeight) - @diagram.options.cellSpacing) / 2
-    @element = @diagram.snap.circle(centerPoint.x, centerPoint.y, radius).attr @cellAttrs('snappy-cell-box')
+    @element = @diagram.snap.circle(centerPoint.x, centerPoint.y, @circleRadius()).attr @cellAttrs('snappy-cell-box')
 
   drawEllipse: ->
     centerPoint = @centerPoint()

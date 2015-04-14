@@ -6,7 +6,7 @@
   cell3 = diagram.addCell(6,0);
 
   cell4 = diagram.addCell(0,5);
-  cell5 = diagram.addCell(3,5, {shape: 'parallelogram'});
+  cell5 = diagram.addCell(3,5, {shape: 'circle'});
   cell6 = diagram.addCell(6,5);
 
   cell7 = diagram.addCell(0,10);
@@ -16,6 +16,33 @@
   cell10 = diagram.addCell(1,0, {shape: 'circle'});
   cell11 = diagram.addCell(0,1, {shape: 'ellipse'});
   cell12 = diagram.addCell(1,1, {attrs: {class: 'orphan'}, shape: 'circle'});
+
+  diagram.addConnector(cell5, cell1);
+  diagram.addConnector(cell5, cell2);
+  diagram.addConnector(cell5, cell3);
+  diagram.addConnector(cell5, cell4);
+  diagram.addConnector(cell5, cell6);
+  diagram.addConnector(cell5, cell7);
+  diagram.addConnector(cell5, cell8);
+  diagram.addConnector(cell5, cell9);
+
+  diagram.draw();
+})();
+
+(function(){
+  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 20 });
+
+  cell1 = diagram.addCell(0,0);
+  cell2 = diagram.addCell(2,0);
+  cell3 = diagram.addCell(4,0);
+
+  cell4 = diagram.addCell(0,2);
+  cell5 = diagram.addCell(2,2, {shape: 'ellipse'});
+  cell6 = diagram.addCell(4,2, {shape: 'parallelogram'});
+
+  cell7 = diagram.addCell(0,4);
+  cell8 = diagram.addCell(2,4);
+  cell9 = diagram.addCell(4,4, {shape: 'parallelogram'});
 
   diagram.addConnector(cell5, cell1);
   diagram.addConnector(cell5, cell2);
