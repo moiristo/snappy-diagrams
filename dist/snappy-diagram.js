@@ -49,125 +49,6 @@
     };
   });
 
-  this.SnappyDiagram = (function() {
-    function SnappyDiagram(options1) {
-      var defaults, key, value;
-      this.options = options1 != null ? options1 : {};
-      this.cellCount = 0;
-      this.rowCount = 0;
-      this.cells = [];
-      this.connectors = [];
-      defaults = {
-        width: 1000,
-        height: 500,
-        cellSpacing: 10,
-        boxRadius: 5,
-        markerWidth: 7,
-        markerHeight: 10
-      };
-      for (key in defaults) {
-        value = defaults[key];
-        if (this.options[key] == null) {
-          this.options[key] = value;
-        }
-      }
-      this.snap = Snap(this.options.width, this.options.height).attr({
-        "class": 'snappy-diagram'
-      });
-      this.markerEnd = this.triangleMarker(this.options.markerWidth, this.options.markerHeight);
-      this.markerStart = this.triangleMarker(this.options.markerWidth, this.options.markerHeight, true);
-    }
-
-    SnappyDiagram.prototype.triangleMarker = function(width, height, reverse) {
-      var connectorPathString, path;
-      if (reverse == null) {
-        reverse = false;
-      }
-      connectorPathString = "M 0 0 L " + height + " " + (width / 2) + " L 0 " + width + " z";
-      path = this.snap.path(connectorPathString);
-      if (reverse) {
-        path = path.transform('r180');
-      }
-      path = path.marker(0, 0, height, width, (reverse ? 1 : height), width / 2);
-      return path;
-    };
-
-    SnappyDiagram.prototype.addCell = function(cellX, cellY, options) {
-      var cell;
-      if (options == null) {
-        options = {};
-      }
-      this.cellCount = Math.max(cellX + 1, this.cellCount);
-      this.rowCount = Math.max(cellY + 1, this.rowCount);
-      if (this.cells[cellX] == null) {
-        this.cells[cellX] = [];
-      }
-      cell = new SnappyCell(this, cellX, cellY, options);
-      this.cells[cellX].push(cell);
-      return cell;
-    };
-
-    SnappyDiagram.prototype.addConnector = function(cellStart, cellEnd, options) {
-      var connector;
-      if (options == null) {
-        options = {};
-      }
-      connector = new SnappyConnector(this, cellStart, cellEnd, options);
-      this.connectors.push(connector);
-      return connector;
-    };
-
-    SnappyDiagram.prototype.setDimensions = function() {
-      this.cellWidth = this.options.width / this.cellCount;
-      return this.cellHeight = this.options.height / this.rowCount;
-    };
-
-    SnappyDiagram.prototype.draw = function() {
-      this.setDimensions();
-      this.drawCells();
-      return this.drawConnectors();
-    };
-
-    SnappyDiagram.prototype.drawCells = function() {
-      var cell, j, len, ref, results, row;
-      this.setDimensions();
-      ref = this.cells;
-      results = [];
-      for (j = 0, len = ref.length; j < len; j++) {
-        row = ref[j];
-        if (row != null) {
-          results.push((function() {
-            var k, len1, results1;
-            results1 = [];
-            for (k = 0, len1 = row.length; k < len1; k++) {
-              cell = row[k];
-              results1.push(cell.draw());
-            }
-            return results1;
-          })());
-        } else {
-          results.push(void 0);
-        }
-      }
-      return results;
-    };
-
-    SnappyDiagram.prototype.drawConnectors = function() {
-      var connector, j, len, ref, results;
-      this.setDimensions();
-      ref = this.connectors;
-      results = [];
-      for (j = 0, len = ref.length; j < len; j++) {
-        connector = ref[j];
-        results.push(connector.draw());
-      }
-      return results;
-    };
-
-    return SnappyDiagram;
-
-  })();
-
   this.SnappyCell = (function() {
     function SnappyCell(diagram, cellX1, cellY1, options1) {
       var base, base1;
@@ -452,6 +333,125 @@
     };
 
     return SnappyConnector;
+
+  })();
+
+  this.SnappyDiagram = (function() {
+    function SnappyDiagram(options1) {
+      var defaults, key, value;
+      this.options = options1 != null ? options1 : {};
+      this.cellCount = 0;
+      this.rowCount = 0;
+      this.cells = [];
+      this.connectors = [];
+      defaults = {
+        width: 1000,
+        height: 500,
+        cellSpacing: 10,
+        boxRadius: 5,
+        markerWidth: 7,
+        markerHeight: 10
+      };
+      for (key in defaults) {
+        value = defaults[key];
+        if (this.options[key] == null) {
+          this.options[key] = value;
+        }
+      }
+      this.snap = Snap(this.options.width, this.options.height).attr({
+        "class": 'snappy-diagram'
+      });
+      this.markerEnd = this.triangleMarker(this.options.markerWidth, this.options.markerHeight);
+      this.markerStart = this.triangleMarker(this.options.markerWidth, this.options.markerHeight, true);
+    }
+
+    SnappyDiagram.prototype.triangleMarker = function(width, height, reverse) {
+      var connectorPathString, path;
+      if (reverse == null) {
+        reverse = false;
+      }
+      connectorPathString = "M 0 0 L " + height + " " + (width / 2) + " L 0 " + width + " z";
+      path = this.snap.path(connectorPathString);
+      if (reverse) {
+        path = path.transform('r180');
+      }
+      path = path.marker(0, 0, height, width, (reverse ? 1 : height), width / 2);
+      return path;
+    };
+
+    SnappyDiagram.prototype.addCell = function(cellX, cellY, options) {
+      var cell;
+      if (options == null) {
+        options = {};
+      }
+      this.cellCount = Math.max(cellX + 1, this.cellCount);
+      this.rowCount = Math.max(cellY + 1, this.rowCount);
+      if (this.cells[cellX] == null) {
+        this.cells[cellX] = [];
+      }
+      cell = new SnappyCell(this, cellX, cellY, options);
+      this.cells[cellX].push(cell);
+      return cell;
+    };
+
+    SnappyDiagram.prototype.addConnector = function(cellStart, cellEnd, options) {
+      var connector;
+      if (options == null) {
+        options = {};
+      }
+      connector = new SnappyConnector(this, cellStart, cellEnd, options);
+      this.connectors.push(connector);
+      return connector;
+    };
+
+    SnappyDiagram.prototype.setDimensions = function() {
+      this.cellWidth = this.options.width / this.cellCount;
+      return this.cellHeight = this.options.height / this.rowCount;
+    };
+
+    SnappyDiagram.prototype.draw = function() {
+      this.setDimensions();
+      this.drawCells();
+      return this.drawConnectors();
+    };
+
+    SnappyDiagram.prototype.drawCells = function() {
+      var cell, j, len, ref, results, row;
+      this.setDimensions();
+      ref = this.cells;
+      results = [];
+      for (j = 0, len = ref.length; j < len; j++) {
+        row = ref[j];
+        if (row != null) {
+          results.push((function() {
+            var k, len1, results1;
+            results1 = [];
+            for (k = 0, len1 = row.length; k < len1; k++) {
+              cell = row[k];
+              results1.push(cell.draw());
+            }
+            return results1;
+          })());
+        } else {
+          results.push(void 0);
+        }
+      }
+      return results;
+    };
+
+    SnappyDiagram.prototype.drawConnectors = function() {
+      var connector, j, len, ref, results;
+      this.setDimensions();
+      ref = this.connectors;
+      results = [];
+      for (j = 0, len = ref.length; j < len; j++) {
+        connector = ref[j];
+        results.push(connector.draw());
+      }
+      return results;
+    };
+
+    return SnappyDiagram;
 
   })();
 

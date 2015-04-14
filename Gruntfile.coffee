@@ -13,14 +13,14 @@ module.exports = (grunt) ->
         files: ['src/snappy-diagram.sass']
         tasks: ['sass']
       coffee:
-        files: ['src/snap-multitext.coffee', 'src/snappy-diagram.coffee']
+        files: ['src/snap-multitext.coffee', 'src/snappy-cell.coffee', 'src/snappy-connector.coffee', 'src/snappy-diagram.coffee']
         tasks: ['coffee:compile']
     coffee:
       compile:
         options:
           join: true
         files:
-          'dist/snappy-diagram.js': ['src/snap-multitext.coffee', 'src/snappy-diagram.coffee']
+          'dist/snappy-diagram.js': ['src/snap-multitext.coffee', 'src/snappy-cell.coffee', 'src/snappy-connector.coffee', 'src/snappy-diagram.coffee']
     sass:
       dist:
         options:
