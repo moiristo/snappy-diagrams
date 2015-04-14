@@ -189,62 +189,83 @@
     };
 
     SnappyCell.prototype.anchorCoords = function(anchor) {
-      var boxRadiusOffset, offset;
-      offset = this.diagram.options.cellSpacing / 2;
-      boxRadiusOffset = this.diagram.options.boxRadius / 3;
+      var xOffset, yOffset;
+      xOffset = this[this.options.shape + "XOffset"] != null ? this[this.options.shape + "XOffset"](anchor) : this.diagram.options.cellSpacing / 2;
+      yOffset = this[this.options.shape + "YOffset"] != null ? this[this.options.shape + "YOffset"](anchor) : this.diagram.options.cellSpacing / 2;
       switch (anchor) {
         case 'top-left':
           return {
-            x: this.x() + offset + boxRadiusOffset,
-            y: this.y() + offset + boxRadiusOffset
+            x: this.x() + xOffset,
+            y: this.y() + yOffset
           };
         case 'top-middle':
           return {
             x: this.x() + this.diagram.cellWidth / 2,
-            y: this.y() + offset
+            y: this.y() + yOffset
           };
         case 'top-right':
           return {
-            x: this.x() + this.diagram.cellWidth - offset - boxRadiusOffset,
-            y: this.y() + offset + boxRadiusOffset
+            x: this.x() + this.diagram.cellWidth - xOffset,
+            y: this.y() + yOffset
           };
         case 'middle-left':
           return {
-            x: this.x() + offset,
+            x: this.x() + xOffset,
             y: this.y() + this.diagram.cellHeight / 2
           };
         case 'middle-right':
           return {
-            x: this.x() + this.diagram.cellWidth - offset,
-            y: this.y() + (this.diagram.cellHeight / 2)
+            x: this.x() + this.diagram.cellWidth - xOffset,
+            y: this.y() + this.diagram.cellHeight / 2
           };
         case 'bottom-left':
           return {
-            x: this.x() + offset + boxRadiusOffset,
-            y: this.y() + this.diagram.cellHeight - offset - boxRadiusOffset
+            x: this.x() + xOffset,
+            y: this.y() + this.diagram.cellHeight - yOffset
           };
         case 'bottom-middle':
           return {
-            x: this.x() + (this.diagram.cellWidth / 2),
-            y: this.y() + this.diagram.cellHeight - offset
+            x: this.x() + this.diagram.cellWidth / 2,
+            y: this.y() + this.diagram.cellHeight - yOffset
           };
         case 'bottom-right':
           return {
-            x: this.x() + this.diagram.cellWidth - offset - boxRadiusOffset,
-            y: this.y() + this.diagram.cellHeight - offset - boxRadiusOffset
+            x: this.x() + this.diagram.cellWidth - xOffset,
+            y: this.y() + this.diagram.cellHeight - yOffset
           };
-        default:
-          return {
-            x: this.x() + (this.diagram.cellWidth / 2),
-            y: this.y() + (this.diagram.cellHeight / 2)
-          };
+      }
+    };
+
+    SnappyCell.prototype.spacingOffset = function() {
+      return this.diagram.options.cellSpacing / 2;
+    };
+
+    SnappyCell.prototype.boxXOffset = function(anchor) {
+      if (['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0) {
+        return this.diagram.options.boxRadius / 3 + this.spacingOffset();
+      } else {
+        return this.spacingOffset();
+      }
+    };
+
+    SnappyCell.prototype.boxYOffset = function(anchor) {
+      return this.boxXOffset(anchor);
+    };
+
+    SnappyCell.prototype.parallelogramXOffset = function(anchor) {
+      if (['top-left', 'bottom-right'].indexOf(anchor) >= 0) {
+        return this.parallelogramOffset() + this.spacingOffset();
+      } else if (['middle-left', 'middle-right'].indexOf(anchor) >= 0) {
+        return this.parallelogramOffset() / 2 + this.spacingOffset();
+      } else {
+        return this.spacingOffset();
       }
     };
 
     SnappyCell.prototype.cellAttrs = function(className) {
       var attrs;
       attrs = this.options.attrs;
-      attrs["class"] = [this.options.attrs["class"], className].join(' ');
+      attrs["class"] = [this.options.attrs["class"], 'snappy-cell', className].join(' ');
       return attrs;
     };
 
@@ -252,6 +273,18 @@
       return {
         x: this.x() + this.diagram.cellWidth / 2,
         y: this.y() + this.diagram.cellHeight / 2
+      };
+    };
+
+    SnappyCell.prototype.boxPoints = function() {
+      var x, y;
+      x = this.x() + this.diagram.options.cellSpacing / 2;
+      y = this.y() + this.diagram.options.cellSpacing / 2;
+      return {
+        x1: x,
+        y1: y,
+        x2: x + this.diagram.cellWidth - this.diagram.options.cellSpacing,
+        y2: y + this.diagram.cellHeight - this.diagram.options.cellSpacing
       };
     };
 
@@ -263,6 +296,9 @@
         case 'ellipse':
           this.drawEllipse();
           break;
+        case 'parallelogram':
+          this.drawParallelogram();
+          break;
         default:
           this.drawBox();
       }
@@ -272,12 +308,9 @@
     };
 
     SnappyCell.prototype.drawBox = function() {
-      var height, width, x, y;
-      x = this.x() + this.diagram.options.cellSpacing / 2;
-      y = this.y() + this.diagram.options.cellSpacing / 2;
-      width = this.diagram.cellWidth - this.diagram.options.cellSpacing;
-      height = this.diagram.cellHeight - this.diagram.options.cellSpacing;
-      return this.element = this.diagram.snap.rect(x, y, width, height, this.diagram.options.boxRadius).attr(this.cellAttrs('snappy-cell-box'));
+      var points;
+      points = this.boxPoints();
+      return this.element = this.diagram.snap.rect(points.x1, points.y1, points.x2 - points.x1, points.y2 - points.y1, this.diagram.options.boxRadius).attr(this.cellAttrs('snappy-cell-box'));
     };
 
     SnappyCell.prototype.drawCircle = function() {
@@ -293,6 +326,19 @@
       xRadius = (this.diagram.cellWidth - this.diagram.options.cellSpacing) / 2;
       yRadius = (this.diagram.cellHeight - this.diagram.options.cellSpacing) / 2;
       return this.element = this.diagram.snap.ellipse(centerPoint.x, centerPoint.y, xRadius, yRadius).attr(this.cellAttrs('snappy-cell-ellipse'));
+    };
+
+    SnappyCell.prototype.parallelogramOffset = function() {
+      var offset;
+      return offset = this.diagram.cellWidth / 10;
+    };
+
+    SnappyCell.prototype.drawParallelogram = function() {
+      var offset, points, polygon;
+      offset = this.parallelogramOffset();
+      points = this.boxPoints();
+      polygon = [points.x1 + offset, points.y1, points.x2, points.y1, points.x2 - offset, points.y2, points.x1, points.y2, points.x1 + offset, points.y1];
+      return this.element = this.diagram.snap.polyline(polygon).attr(this.cellAttrs('snappy-cell-parallelogram'));
     };
 
     SnappyCell.prototype.drawText = function() {

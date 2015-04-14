@@ -1,17 +1,17 @@
 (function(){
-  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 0 });
+  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 10 });
 
   cell1 = diagram.addCell(0,0);
   cell2 = diagram.addCell(3,0);
   cell3 = diagram.addCell(6,0);
 
   cell4 = diagram.addCell(0,5);
-  cell5 = diagram.addCell(3,5);
+  cell5 = diagram.addCell(3,5, {shape: 'parallelogram'});
   cell6 = diagram.addCell(6,5);
 
   cell7 = diagram.addCell(0,10);
   cell8 = diagram.addCell(3,10);
-  cell9 = diagram.addCell(6,10);
+  cell9 = diagram.addCell(6,10, {shape: 'parallelogram'});
 
   cell10 = diagram.addCell(1,0, {shape: 'circle'});
   cell11 = diagram.addCell(0,1, {shape: 'ellipse'});
