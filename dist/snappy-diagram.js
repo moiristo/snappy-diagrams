@@ -248,10 +248,20 @@
       return attrs;
     };
 
+    SnappyCell.prototype.centerPoint = function() {
+      return {
+        x: this.x() + this.diagram.cellWidth / 2,
+        y: this.y() + this.diagram.cellHeight / 2
+      };
+    };
+
     SnappyCell.prototype.draw = function() {
       switch (this.options.shape) {
         case 'circle':
           this.drawCircle();
+          break;
+        case 'ellipse':
+          this.drawEllipse();
           break;
         default:
           this.drawBox();
@@ -271,11 +281,18 @@
     };
 
     SnappyCell.prototype.drawCircle = function() {
-      var radius, x, y;
-      x = this.x() + this.diagram.cellWidth / 2;
-      y = this.y() + this.diagram.cellHeight / 2;
+      var centerPoint, radius;
+      centerPoint = this.centerPoint();
       radius = (Math.min(this.diagram.cellWidth, this.diagram.cellHeight) - this.diagram.options.cellSpacing) / 2;
-      return this.element = this.diagram.snap.circle(x, y, radius).attr(this.cellAttrs('snappy-cell-box'));
+      return this.element = this.diagram.snap.circle(centerPoint.x, centerPoint.y, radius).attr(this.cellAttrs('snappy-cell-box'));
+    };
+
+    SnappyCell.prototype.drawEllipse = function() {
+      var centerPoint, xRadius, yRadius;
+      centerPoint = this.centerPoint();
+      xRadius = (this.diagram.cellWidth - this.diagram.options.cellSpacing) / 2;
+      yRadius = (this.diagram.cellHeight - this.diagram.options.cellSpacing) / 2;
+      return this.element = this.diagram.snap.ellipse(centerPoint.x, centerPoint.y, xRadius, yRadius).attr(this.cellAttrs('snappy-cell-ellipse'));
     };
 
     SnappyCell.prototype.drawText = function() {

@@ -107,9 +107,14 @@ class @SnappyCell
     attrs.class = [@options.attrs.class, className].join(' ')
     attrs
 
+  centerPoint: ->
+    x: @x() + @diagram.cellWidth / 2
+    y: @y() + @diagram.cellHeight / 2
+
   draw: ->
     switch @options.shape
       when 'circle' then @drawCircle()
+      when 'ellipse' then @drawEllipse()
       else @drawBox()
     @element = @diagram.snap.g(@element, @drawText()) if @options.text
 
@@ -121,10 +126,15 @@ class @SnappyCell
     @element = @diagram.snap.rect(x, y, width, height, @diagram.options.boxRadius).attr @cellAttrs('snappy-cell-box')
 
   drawCircle: ->
-    x = @x() + @diagram.cellWidth / 2
-    y = @y() + @diagram.cellHeight / 2
+    centerPoint = @centerPoint()
     radius = (Math.min(@diagram.cellWidth, @diagram.cellHeight) - @diagram.options.cellSpacing) / 2
-    @element = @diagram.snap.circle(x, y, radius).attr @cellAttrs('snappy-cell-box')
+    @element = @diagram.snap.circle(centerPoint.x, centerPoint.y, radius).attr @cellAttrs('snappy-cell-box')
+
+  drawEllipse: ->
+    centerPoint = @centerPoint()
+    xRadius = (@diagram.cellWidth  - @diagram.options.cellSpacing) / 2
+    yRadius = (@diagram.cellHeight - @diagram.options.cellSpacing) / 2
+    @element = @diagram.snap.ellipse(centerPoint.x, centerPoint.y, xRadius, yRadius).attr @cellAttrs('snappy-cell-ellipse')
 
   drawText: ->
     x = @x() + @diagram.options.cellSpacing / 2

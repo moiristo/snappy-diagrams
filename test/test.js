@@ -13,8 +13,8 @@
   cell8 = diagram.addCell(3,10);
   cell9 = diagram.addCell(6,10);
 
-  cell10 = diagram.addCell(1,0);
-  cell11 = diagram.addCell(0,1);
+  cell10 = diagram.addCell(1,0, {shape: 'circle'});
+  cell11 = diagram.addCell(0,1, {shape: 'ellipse'});
   cell12 = diagram.addCell(1,1, {attrs: {class: 'orphan'}, shape: 'circle'});
 
   diagram.addConnector(cell5, cell1);
