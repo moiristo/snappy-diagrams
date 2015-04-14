@@ -29,7 +29,7 @@
       tspans = t.selectAll('tspan:nth-child(n+2)');
       tspans.attr({
         x: x,
-        dy: '1em'
+        dy: '1.3em'
       });
       bbox = t.getBBox();
       if (bbox.width < maxWidth) {
@@ -51,17 +51,19 @@
 
   this.SnappyDiagram = (function() {
     function SnappyDiagram(options1) {
-      var arrowPathString, defaults, key, value;
+      var defaults, key, value;
       this.options = options1 != null ? options1 : {};
       this.cellCount = 0;
       this.rowCount = 0;
       this.cells = [];
-      this.arrows = [];
+      this.connectors = [];
       defaults = {
         width: 1000,
         height: 500,
         cellSpacing: 10,
-        boxRadius: 5
+        boxRadius: 5,
+        markerWidth: 7,
+        markerHeight: 10
       };
       for (key in defaults) {
         value = defaults[key];
@@ -72,10 +74,23 @@
       this.snap = Snap(this.options.width, this.options.height).attr({
         "class": 'snappy-diagram'
       });
-      arrowPathString = "M 0 2 L 10 5 L 0 8 z";
-      this.markerStart = this.snap.path(arrowPathString).transform('r180').marker(0, 0, 10, 10, 1, 5);
-      this.markerEnd = this.snap.path(arrowPathString).marker(0, 0, 10, 10, 9, 5);
+      this.markerEnd = this.triangleMarker(this.options.markerWidth, this.options.markerHeight);
+      this.markerStart = this.triangleMarker(this.options.markerWidth, this.options.markerHeight, true);
     }
+
+    SnappyDiagram.prototype.triangleMarker = function(width, height, reverse) {
+      var connectorPathString, path;
+      if (reverse == null) {
+        reverse = false;
+      }
+      connectorPathString = "M 0 0 L " + height + " " + (width / 2) + " L 0 " + width + " z";
+      path = this.snap.path(connectorPathString);
+      if (reverse) {
+        path = path.transform('r180');
+      }
+      path = path.marker(0, 0, height, width, (reverse ? 1 : height), width / 2);
+      return path;
+    };
 
     SnappyDiagram.prototype.addCell = function(cellX, cellY, options) {
       var cell;
@@ -93,13 +108,13 @@
     };
 
     SnappyDiagram.prototype.addConnector = function(cellStart, cellEnd, options) {
-      var arrow;
+      var connector;
       if (options == null) {
         options = {};
       }
-      arrow = new SnappyConnector(this, cellStart, cellEnd, options);
-      this.arrows.push(arrow);
-      return arrow;
+      connector = new SnappyConnector(this, cellStart, cellEnd, options);
+      this.connectors.push(connector);
+      return connector;
     };
 
     SnappyDiagram.prototype.setDimensions = function() {
@@ -138,13 +153,13 @@
     };
 
     SnappyDiagram.prototype.drawConnectors = function() {
-      var arrow, j, len, ref, results;
+      var connector, j, len, ref, results;
       this.setDimensions();
-      ref = this.arrows;
+      ref = this.connectors;
       results = [];
       for (j = 0, len = ref.length; j < len; j++) {
-        arrow = ref[j];
-        results.push(arrow.draw());
+        connector = ref[j];
+        results.push(connector.draw());
       }
       return results;
     };
@@ -266,7 +281,7 @@
     SnappyCell.prototype.drawText = function() {
       var maxHeight, maxWidth, textElement, x, y;
       x = this.x() + this.diagram.options.cellSpacing / 2;
-      y = this.y() + this.diagram.options.cellSpacing / 2;
+      y = this.y();
       maxWidth = this.diagram.cellWidth - this.diagram.options.cellSpacing;
       maxHeight = this.diagram.cellHeight - this.diagram.options.cellSpacing;
       return textElement = this.diagram.snap.multitext(x, y, this.options.text, maxWidth, maxHeight);
@@ -286,9 +301,9 @@
     }
 
     SnappyConnector.prototype.horizontalLabel = function(diff) {
-      if (diff > 0) {
+      if (diff > 1) {
         return 'left';
-      } else if (diff < 0) {
+      } else if (diff < -1) {
         return 'right';
       } else {
         return 'middle';
@@ -296,9 +311,9 @@
     };
 
     SnappyConnector.prototype.verticalLabel = function(diff) {
-      if (diff > 0) {
+      if (diff > 1) {
         return 'top';
-      } else if (diff < 0) {
+      } else if (diff < -1) {
         return 'bottom';
       } else {
         return 'middle';
@@ -307,8 +322,8 @@
 
     SnappyConnector.prototype.draw = function() {
       var attrs, endAnchor, endLabel, line, startAnchor, startLabel;
-      startLabel = this.options.startAnchor || [this.verticalLabel(this.cellStart.y() - this.cellEnd.y()), this.horizontalLabel(this.cellStart.x() - this.cellEnd.x())].join('-');
-      endLabel = this.options.endAnchor || [this.verticalLabel(this.cellEnd.y() - this.cellStart.y()), this.horizontalLabel(this.cellEnd.x() - this.cellStart.x())].join('-');
+      startLabel = this.options.startAnchor || [this.verticalLabel(this.cellStart.cellY - this.cellEnd.cellY), this.horizontalLabel(this.cellStart.cellX - this.cellEnd.cellX)].join('-');
+      endLabel = this.options.endAnchor || [this.verticalLabel(this.cellEnd.cellY - this.cellStart.cellY), this.horizontalLabel(this.cellEnd.cellX - this.cellStart.cellX)].join('-');
       startAnchor = this.cellStart.anchorCoords(startLabel);
       endAnchor = this.cellEnd.anchorCoords(endLabel);
       attrs = {};

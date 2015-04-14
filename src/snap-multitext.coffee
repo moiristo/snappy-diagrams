@@ -29,7 +29,7 @@ Snap.plugin (Snap, Element, Paper, glob) ->
     y = y + t.getBBox().height
 
     tspans = t.selectAll('tspan:nth-child(n+2)')
-    tspans.attr x: x, dy: '1em'
+    tspans.attr x: x, dy: '1.3em'
 
     bbox = t.getBBox()
     if bbox.width < maxWidth

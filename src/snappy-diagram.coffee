@@ -3,22 +3,29 @@ class @SnappyDiagram
     @cellCount = 0
     @rowCount = 0
     @cells = []
-    @arrows = []
+    @connectors = []
 
     defaults =
       width: 1000
       height: 500
       cellSpacing: 10
       boxRadius: 5
+      markerWidth: 7
+      markerHeight: 10
 
     for key, value of defaults
       @options[key] = value unless @options[key]?
 
     @snap = Snap(@options.width, @options.height).attr(class: 'snappy-diagram')
+    @markerEnd = @triangleMarker(@options.markerWidth, @options.markerHeight)
+    @markerStart = @triangleMarker(@options.markerWidth, @options.markerHeight, true)
 
-    arrowPathString = "M 0 2 L 10 5 L 0 8 z";
-    @markerStart = @snap.path(arrowPathString).transform('r180').marker(0, 0, 10, 10, 1, 5)
-    @markerEnd = @snap.path(arrowPathString).marker(0, 0, 10, 10, 9, 5)
+  triangleMarker: (width, height, reverse = false) ->
+    connectorPathString = "M 0 0 L #{height} #{width / 2} L 0 #{width} z"
+    path = @snap.path(connectorPathString)
+    path = path.transform('r180') if reverse
+    path = path.marker(0, 0, height, width, (if reverse then 1 else height), width / 2)
+    path
 
   addCell: (cellX, cellY, options = {}) ->
     @cellCount = Math.max cellX + 1, @cellCount
@@ -30,9 +37,9 @@ class @SnappyDiagram
     cell
 
   addConnector: (cellStart, cellEnd, options = {}) ->
-    arrow = new SnappyConnector(@, cellStart, cellEnd, options)
-    @arrows.push arrow
-    arrow
+    connector = new SnappyConnector(@, cellStart, cellEnd, options)
+    @connectors.push connector
+    connector
 
   setDimensions: ->
     @cellWidth = @options.width / @cellCount
@@ -51,7 +58,7 @@ class @SnappyDiagram
 
   drawConnectors: ->
     @setDimensions()
-    arrow.draw() for arrow in @arrows
+    connector.draw() for connector in @connectors
 
 class @SnappyCell
   constructor: (@diagram, @cellX, @cellY, @options = {}) ->
@@ -121,7 +128,7 @@ class @SnappyCell
 
   drawText: ->
     x = @x() + @diagram.options.cellSpacing / 2
-    y = @y() + @diagram.options.cellSpacing / 2
+    y = @y()
     maxWidth = @diagram.cellWidth - @diagram.options.cellSpacing
     maxHeight = @diagram.cellHeight - @diagram.options.cellSpacing
     textElement = @diagram.snap.multitext(x, y, @options.text, maxWidth, maxHeight)
@@ -132,14 +139,14 @@ class @SnappyConnector
     @
 
   horizontalLabel: (diff) ->
-    if diff > 0 then 'left' else if diff < 0 then 'right' else 'middle'
+    if diff > 1 then 'left' else if diff < -1 then 'right' else 'middle'
 
   verticalLabel: (diff) ->
-    if diff > 0 then 'top' else if diff < 0 then 'bottom' else 'middle'
+    if diff > 1 then 'top' else if diff < -1 then 'bottom' else 'middle'
 
   draw: ->
-    startLabel = @options.startAnchor || [ @verticalLabel(@cellStart.y() - @cellEnd.y()), @horizontalLabel(@cellStart.x() - @cellEnd.x()) ].join('-')
-    endLabel = @options.endAnchor || [ @verticalLabel(@cellEnd.y() - @cellStart.y()), @horizontalLabel(@cellEnd.x() - @cellStart.x()) ].join('-')
+    startLabel =  @options.startAnchor  || [ @verticalLabel(@cellStart.cellY - @cellEnd.cellY), @horizontalLabel(@cellStart.cellX - @cellEnd.cellX) ].join('-')
+    endLabel =    @options.endAnchor    || [ @verticalLabel(@cellEnd.cellY - @cellStart.cellY), @horizontalLabel(@cellEnd.cellX - @cellStart.cellX) ].join('-')
 
     startAnchor = @cellStart.anchorCoords startLabel
     endAnchor = @cellEnd.anchorCoords endLabel

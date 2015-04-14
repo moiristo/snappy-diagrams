@@ -30,18 +30,18 @@
 })();
 
 (function(){
-  diagram2 = new SnappyDiagram({ width: 800, height: 600, boxRadius: 0 });
+  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 3 });
 
-  dcell1 = diagram2.addCell(0,0, { text: 'Nedforce Informatica Specialisten' });
-  dcell2 = diagram2.addCell(1,0, { text: 'National Aeronautics and Space Administration' });
-  dcell3 = diagram2.addCell(2,0, { text: 'Peder Inc.' });
-  dcell4 = diagram2.addCell(1,2);
-  dcell5 = diagram2.addCell(1,4);
+  cell1 = diagram.addCell(0,0, { text: 'Nedforce Informatica Specialisten' });
+  cell2 = diagram.addCell(1,0, { text: 'National Aeronautics and Space Administration' });
+  cell3 = diagram.addCell(2,0, { text: 'Peder Inc.' });
+  cell4 = diagram.addCell(1,2, { text: 'Nullam id dolor id nibh ultricies vehicula ut id elit. Donec id elit non mi porta gravida at eget metus.'});
+  cell5 = diagram.addCell(1,4);
 
-  diagram2.addConnector(dcell1, dcell4, {style: 'line', startAnchor: 'bottom-middle'});
-  diagram2.addConnector(dcell2, dcell4);
-  diagram2.addConnector(dcell3, dcell4, {startAnchor: 'bottom-middle'});
-  diagram2.addConnector(dcell4, dcell5);
+  diagram.addConnector(cell1, cell4, {style: 'line', startAnchor: 'bottom-middle'});
+  diagram.addConnector(cell2, cell4);
+  diagram.addConnector(cell3, cell4, {startAnchor: 'bottom-middle'});
+  diagram.addConnector(cell4, cell5, {style: 'double'});
 
-  diagram2.draw();
+  diagram.draw();
 })();
