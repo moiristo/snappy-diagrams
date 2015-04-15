@@ -59,3 +59,32 @@ class @SnappyDiagram
   drawConnectors: ->
     @setDimensions()
     connector.draw() for connector in @connectors
+
+  inlineCss: ->
+    # when running locally, Chrome has to be started with the '--allow-file-access-from-files' parameter for this to work,
+    # otherwise the css rules in external stylesheets cannot be read (security policy)
+    for stylesheet in document.styleSheets
+      if stylesheet.href?
+        name = stylesheet.href.split('/')
+        if name[name.length - 1] == 'snappy-diagram.css'
+          for rule in stylesheet.cssRules || stylesheet.rules || []
+            element.style.cssText += rule.style.cssText for element in document.querySelectorAll(rule.selectorText)
+          break
+
+  export: ->
+    # inline all CSS, as external css rules are ignored
+    @inlineCss()
+
+    # canvas: IE9+, btoa: IE10+
+    canvas = document.createElement 'canvas'
+    svgImage = new Image()
+    svgImage.src = "data:image/svg+xml;base64,#{btoa(@snap.node.outerHTML)}"
+    svgImage.onload = ->
+      canvas.width = svgImage.width
+      canvas.height = svgImage.height
+      canvas.getContext('2d').drawImage(svgImage, 0, 0)
+
+      link = document.createElement 'a'
+      link.href = canvas.toDataURL 'image/png'
+      link.download = 'snappy-diagram.png'
+      link.click()

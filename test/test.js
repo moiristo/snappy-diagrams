@@ -71,4 +71,8 @@
   diagram.addConnector(cell4, cell5, {style: 'double'});
 
   diagram.draw();
+
+  window.onload = function() {
+    document.getElementById('export-button').onclick = function(){ diagram.export() };
+  };
 })();
