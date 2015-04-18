@@ -529,41 +529,25 @@
       return path;
     };
 
-    SnappyDiagram.prototype.inlineCss = function() {
-      var element, j, k, len, len1, len2, m, name, ref, ref1, ref2, results, rule, stylesheet;
+    SnappyDiagram.prototype["export"] = function() {
+      var canvas, element, j, k, len, len1, len2, m, ref, ref1, ref2, rule, stylesheet, svg, svgImage;
+      svg = this.snap.node.cloneNode(true);
       ref = document.styleSheets;
-      results = [];
       for (j = 0, len = ref.length; j < len; j++) {
         stylesheet = ref[j];
-        if (stylesheet.href != null) {
-          name = stylesheet.href.split('/');
-          if (name[name.length - 1] === 'snappy-diagram.css') {
-            ref1 = stylesheet.cssRules || stylesheet.rules || [];
-            for (k = 0, len1 = ref1.length; k < len1; k++) {
-              rule = ref1[k];
-              ref2 = document.querySelectorAll(rule.selectorText);
-              for (m = 0, len2 = ref2.length; m < len2; m++) {
-                element = ref2[m];
-                element.style.cssText += rule.style.cssText;
-              }
-            }
-            break;
-          } else {
-            results.push(void 0);
+        ref1 = stylesheet.cssRules || stylesheet.rules || [];
+        for (k = 0, len1 = ref1.length; k < len1; k++) {
+          rule = ref1[k];
+          ref2 = svg.querySelectorAll(rule.selectorText);
+          for (m = 0, len2 = ref2.length; m < len2; m++) {
+            element = ref2[m];
+            element.style.cssText += rule.style.cssText;
           }
-        } else {
-          results.push(void 0);
         }
       }
-      return results;
-    };
-
-    SnappyDiagram.prototype["export"] = function() {
-      var canvas, svgImage;
-      this.inlineCss();
       canvas = document.createElement('canvas');
       svgImage = new Image();
-      svgImage.src = "data:image/svg+xml;base64," + (btoa(this.snap.node.outerHTML));
+      svgImage.src = "data:image/svg+xml;base64," + (btoa(svg.outerHTML));
       return svgImage.onload = function() {
         var link;
         canvas.width = svgImage.width;

@@ -65,25 +65,21 @@ class @SnappyDiagram
     path = path.marker(0, 0, height, width, (if reverse then 1 else height), width / 2)
     path
 
-  inlineCss: ->
-    # when running locally, Chrome has to be started with the '--allow-file-access-from-files' parameter for this to work,
+  export: ->
+    # Copy the svg
+    svg = @snap.node.cloneNode(true)
+
+    # Inline all CSS, as external css rules are ignored. When running locally, Chrome
+    # has to be started with the '--allow-file-access-from-files' parameter for this to work,
     # otherwise the css rules in external stylesheets cannot be read (security policy)
     for stylesheet in document.styleSheets
-      if stylesheet.href?
-        name = stylesheet.href.split('/')
-        if name[name.length - 1] == 'snappy-diagram.css'
-          for rule in stylesheet.cssRules || stylesheet.rules || []
-            element.style.cssText += rule.style.cssText for element in document.querySelectorAll(rule.selectorText)
-          break
-
-  export: ->
-    # inline all CSS, as external css rules are ignored
-    @inlineCss()
+      for rule in stylesheet.cssRules || stylesheet.rules || []
+        element.style.cssText += rule.style.cssText for element in svg.querySelectorAll(rule.selectorText)
 
     # canvas: IE9+, btoa: IE10+
     canvas = document.createElement 'canvas'
     svgImage = new Image()
-    svgImage.src = "data:image/svg+xml;base64,#{btoa(@snap.node.outerHTML)}"
+    svgImage.src = "data:image/svg+xml;base64,#{btoa(svg.outerHTML)}"
     svgImage.onload = ->
       canvas.width = svgImage.width
       canvas.height = svgImage.height
