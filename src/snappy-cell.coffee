@@ -4,9 +4,9 @@
 #
 # ---------------------------------------------------------
 
-class @SnappyCell
+class SnappyCell
   constructor: (@diagram, @cellX, @cellY, @options = {}) ->
-    @options.shape ||= 'box'
+    throw new Error("Can't instantiate abstract class SnappyCell") if @constructor == SnappyCell
     @options.attrs ||= {}
     @
 
@@ -14,8 +14,8 @@ class @SnappyCell
   y: -> @cellY * @diagram.cellHeight
 
   anchorCoords: (anchor) ->
-    xOffset = if @["#{@options.shape}XOffset"]? then @["#{@options.shape}XOffset"](anchor) else @diagram.options.cellSpacing / 2
-    yOffset = if @["#{@options.shape}YOffset"]? then @["#{@options.shape}YOffset"](anchor) else @diagram.options.cellSpacing / 2
+    xOffset = @xOffset(anchor)
+    yOffset = @yOffset(anchor)
 
     switch anchor
       when 'top-left'
@@ -43,55 +43,9 @@ class @SnappyCell
         x: @x() + @diagram.cellWidth - xOffset
         y: @y() + @diagram.cellHeight - yOffset
 
-  spacingOffset: ->
-    @diagram.options.cellSpacing / 2
-
-  circleRadius: ->
-    (Math.min(@diagram.cellWidth, @diagram.cellHeight) - @diagram.options.cellSpacing) / 2
-
-  boxXOffset: (anchor) ->
-    if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
-      @diagram.options.boxRadius / 3 + @spacingOffset()
-    else
-      @spacingOffset()
-  boxYOffset: (anchor) ->
-    @boxXOffset(anchor)
-
-  parallelogramXOffset: (anchor) ->
-    if ['top-left', 'bottom-right'].indexOf(anchor) >= 0
-      @parallelogramOffset() + @spacingOffset()
-    else if ['middle-left', 'middle-right'].indexOf(anchor) >= 0
-      @parallelogramOffset() / 2 + @spacingOffset()
-    else
-      @spacingOffset()
-
-  ellipseXOffset: (anchor) ->
-    if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
-      @spacingOffset() + @diagram.cellWidth * 0.1313
-    else
-      @spacingOffset()
-
-  ellipseYOffset: (anchor) ->
-    if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
-      @spacingOffset() + @diagram.cellHeight * 0.1313
-    else
-      @spacingOffset()
-
-  circleXOffset: (anchor) ->
-    offset = @spacingOffset()
-    if @diagram.cellWidth > @diagram.cellHeight && ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right'].indexOf(anchor) >= 0
-      offset += (@diagram.cellWidth - @diagram.cellHeight ) / 2
-
-    offset += @circleRadius() * 0.2626 if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
-    if offset? then offset else @spacingOffset()
-
-  circleYOffset: (anchor) ->
-    offset = @spacingOffset()
-    if @diagram.cellHeight > @diagram.cellWidth && ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right'].indexOf(anchor) >= 0
-      offset += (@diagram.cellHeight - @diagram.cellWidth ) / 2
-
-    offset += @circleRadius() * 0.2626 if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
-    if offset? then offset else @spacingOffset()
+  xOffset: -> @diagram.options.cellSpacing / 2
+  yOffset: -> @diagram.options.cellSpacing / 2
+  spacingOffset: -> @diagram.options.cellSpacing / 2
 
   cellAttrs: (className) ->
     attrs = @options.attrs
@@ -112,46 +66,11 @@ class @SnappyCell
     y2: y + @diagram.cellHeight - @diagram.options.cellSpacing
 
   draw: ->
-    switch @options.shape
-      when 'circle' then @drawCircle()
-      when 'ellipse' then @drawEllipse()
-      when 'parallelogram' then @drawParallelogram()
-      else @drawBox()
+    @element = @drawElement()
     @element = @diagram.snap.g(@element, @drawText()) if @options.text
+    @element
 
-  drawBox: ->
-    points = @boxPoints()
-    @element = @diagram.snap.rect(points.x1, points.y1, points.x2 - points.x1, points.y2 - points.y1, @diagram.options.boxRadius).attr @cellAttrs('snappy-cell-box')
-
-  drawCircle: ->
-    centerPoint = @centerPoint()
-    @element = @diagram.snap.circle(centerPoint.x, centerPoint.y, @circleRadius()).attr @cellAttrs('snappy-cell-box')
-
-  drawEllipse: ->
-    centerPoint = @centerPoint()
-    xRadius = (@diagram.cellWidth  - @diagram.options.cellSpacing) / 2
-    yRadius = (@diagram.cellHeight - @diagram.options.cellSpacing) / 2
-    @element = @diagram.snap.ellipse(centerPoint.x, centerPoint.y, xRadius, yRadius).attr @cellAttrs('snappy-cell-ellipse')
-
-  parallelogramOffset: ->
-    offset = @diagram.cellWidth / 10
-
-  drawParallelogram: ->
-    offset = @parallelogramOffset()
-    points = @boxPoints()
-    polygon = [
-      points.x1 + offset, # p1
-      points.y1,
-      points.x2,          # p2
-      points.y1,
-      points.x2 - offset, # p3
-      points.y2,
-      points.x1,          # p4
-      points.y2,
-      points.x1 + offset, # p1
-      points.y1,
-    ]
-    @element = @diagram.snap.polyline(polygon).attr @cellAttrs('snappy-cell-parallelogram')
+  drawElement: -> throw new Error 'Abstract method'
 
   drawText: ->
     x = @x() + @diagram.options.cellSpacing / 2

@@ -20,19 +20,17 @@ class @SnappyDiagram
     @markerEnd = @triangleMarker(@options.markerWidth, @options.markerHeight)
     @markerStart = @triangleMarker(@options.markerWidth, @options.markerHeight, true)
 
-  triangleMarker: (width, height, reverse = false) ->
-    connectorPathString = "M 0 0 L #{height} #{width / 2} L 0 #{width} z"
-    path = @snap.path(connectorPathString)
-    path = path.transform('r180') if reverse
-    path = path.marker(0, 0, height, width, (if reverse then 1 else height), width / 2)
-    path
+  addBox: (cellX, cellY, options = {}) ->           @addCell SnappyBox, cellX, cellY, options
+  addParallelogram: (cellX, cellY, options = {}) -> @addCell SnappyParallelogram, cellX, cellY, options
+  addCircle: (cellX, cellY, options = {}) ->        @addCell SnappyCircle, cellX, cellY, options
+  addEllipse: (cellX, cellY, options = {}) ->       @addCell SnappyEllipse, cellX, cellY, options
 
-  addCell: (cellX, cellY, options = {}) ->
+  addCell: (cellClass, cellX, cellY, options = {}) ->
     @cellCount = Math.max cellX + 1, @cellCount
     @rowCount = Math.max cellY + 1, @rowCount
     @cells[cellX] = [] unless @cells[cellX]?
 
-    cell = new SnappyCell(@, cellX, cellY, options)
+    cell = new cellClass(@, cellX, cellY, options)
     @cells[cellX].push cell
     cell
 
@@ -41,14 +39,14 @@ class @SnappyDiagram
     @connectors.push connector
     connector
 
-  setDimensions: ->
-    @cellWidth = @options.width / @cellCount
-    @cellHeight = @options.height / @rowCount
-
   draw: ->
     @setDimensions()
     @drawCells()
     @drawConnectors()
+
+  setDimensions: ->
+    @cellWidth = @options.width / @cellCount
+    @cellHeight = @options.height / @rowCount
 
   drawCells: ->
     @setDimensions()
@@ -59,6 +57,13 @@ class @SnappyDiagram
   drawConnectors: ->
     @setDimensions()
     connector.draw() for connector in @connectors
+
+  triangleMarker: (width, height, reverse = false) ->
+    connectorPathString = "M 0 0 L #{height} #{width / 2} L 0 #{width} z"
+    path = @snap.path(connectorPathString)
+    path = path.transform('r180') if reverse
+    path = path.marker(0, 0, height, width, (if reverse then 1 else height), width / 2)
+    path
 
   inlineCss: ->
     # when running locally, Chrome has to be started with the '--allow-file-access-from-files' parameter for this to work,

@@ -1,4 +1,4 @@
-class @SnappyConnector
+class SnappyConnector
   constructor: (@diagram, @cellStart, @cellEnd, @options = {}) ->
     @
 
