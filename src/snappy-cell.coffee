@@ -1,9 +1,3 @@
-# ---------------------------------------------------------
-#
-# shape options: box || circle || ellipsis || parallelogram
-#
-# ---------------------------------------------------------
-
 class SnappyCell
   constructor: (@diagram, @cellX, @cellY, @options = {}) ->
     throw new Error("Can't instantiate abstract class SnappyCell") if @constructor == SnappyCell
