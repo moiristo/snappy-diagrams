@@ -75,3 +75,8 @@ class SnappyCell
     y = @y()
 
     textElement = @diagram.snap.multitext(x, y, @options.text, @boxWidth(), @boxHeight())
+
+  toString: ->
+    representation = "#{@constructor.name}@#{@cellX},#{@cellY}"
+    representation += ":#{@options.text}" if @options.text
+    representation

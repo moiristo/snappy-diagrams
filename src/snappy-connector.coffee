@@ -21,3 +21,12 @@ class SnappyConnector
     attrs.class = 'snappy-connector'
 
     line = @diagram.snap.line(startAnchor.x, startAnchor.y, endAnchor.x, endAnchor.y).attr(attrs)
+
+  toString: ->
+    connector = switch @options.style
+      when 'line' then '-'
+      when 'double' then '<->'
+      else  '->'
+
+    "SnappyConnector:(#{@cellStart.toString()})#{connector}(#{@cellEnd.toString()})"
+

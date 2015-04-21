@@ -188,6 +188,15 @@
       return textElement = this.diagram.snap.multitext(x, y, this.options.text, this.boxWidth(), this.boxHeight());
     };
 
+    SnappyCell.prototype.toString = function() {
+      var representation;
+      representation = this.constructor.name + "@" + this.cellX + "," + this.cellY;
+      if (this.options.text) {
+        representation += ":" + this.options.text;
+      }
+      return representation;
+    };
+
     return SnappyCell;
 
   })();
@@ -421,6 +430,21 @@
       }
       attrs["class"] = 'snappy-connector';
       return line = this.diagram.snap.line(startAnchor.x, startAnchor.y, endAnchor.x, endAnchor.y).attr(attrs);
+    };
+
+    SnappyConnector.prototype.toString = function() {
+      var connector;
+      connector = (function() {
+        switch (this.options.style) {
+          case 'line':
+            return '-';
+          case 'double':
+            return '<->';
+          default:
+            return '->';
+        }
+      }).call(this);
+      return "SnappyConnector:(" + (this.cellStart.toString()) + ")" + connector + "(" + (this.cellEnd.toString()) + ")";
     };
 
     return SnappyConnector;
