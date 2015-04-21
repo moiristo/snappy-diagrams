@@ -22,6 +22,7 @@ class @SnappyDiagram
 
   addBox: (cellX, cellY, options = {}) ->           @addCell SnappyBox, cellX, cellY, options
   addParallelogram: (cellX, cellY, options = {}) -> @addCell SnappyParallelogram, cellX, cellY, options
+  addDiamond: (cellX, cellY, options = {}) ->       @addCell SnappyDiamond, cellX, cellY, options
   addCircle: (cellX, cellY, options = {}) ->        @addCell SnappyCircle, cellX, cellY, options
   addEllipse: (cellX, cellY, options = {}) ->       @addCell SnappyEllipse, cellX, cellY, options
 

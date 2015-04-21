@@ -9,5 +9,5 @@ class SnappyBox extends SnappyCell
       @diagram.options.boxRadius / 3 + @spacingOffset()
     else
       @spacingOffset()
-  yOffset: (anchor) ->
-    @xOffset(anchor)
+
+  yOffset: (anchor) -> @xOffset(anchor)

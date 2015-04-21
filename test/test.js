@@ -37,7 +37,7 @@
   cell3 = diagram.addBox(4,0);
 
   cell4 = diagram.addBox(0,2);
-  cell5 = diagram.addEllipse(2,2);
+  cell5 = diagram.addDiamond(2,2);
   cell6 = diagram.addParallelogram(4,2);
 
   cell7 = diagram.addBox(0,4);

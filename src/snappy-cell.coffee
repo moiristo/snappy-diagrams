@@ -43,6 +43,10 @@ class SnappyCell
         x: @x() + @diagram.cellWidth - xOffset
         y: @y() + @diagram.cellHeight - yOffset
 
+
+  boxWidth:  -> @diagram.cellWidth - @diagram.options.cellSpacing
+  boxHeight: -> @diagram.cellHeight - @diagram.options.cellSpacing
+
   xOffset: -> @diagram.options.cellSpacing / 2
   yOffset: -> @diagram.options.cellSpacing / 2
   spacingOffset: -> @diagram.options.cellSpacing / 2
@@ -62,8 +66,8 @@ class SnappyCell
 
     x1: x
     y1: y
-    x2: x + @diagram.cellWidth - @diagram.options.cellSpacing
-    y2: y + @diagram.cellHeight - @diagram.options.cellSpacing
+    x2: x + @boxWidth()
+    y2: y + @boxHeight()
 
   draw: ->
     @element = @drawElement()
@@ -75,6 +79,5 @@ class SnappyCell
   drawText: ->
     x = @x() + @diagram.options.cellSpacing / 2
     y = @y()
-    maxWidth = @diagram.cellWidth - @diagram.options.cellSpacing
-    maxHeight = @diagram.cellHeight - @diagram.options.cellSpacing
-    textElement = @diagram.snap.multitext(x, y, @options.text, maxWidth, maxHeight)
+
+    textElement = @diagram.snap.multitext(x, y, @options.text, @boxWidth(), @boxHeight())
