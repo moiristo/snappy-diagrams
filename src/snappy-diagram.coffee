@@ -20,11 +20,11 @@ class @SnappyDiagram
     @markerEnd = @triangleMarker(@options.markerWidth, @options.markerHeight)
     @markerStart = @triangleMarker(@options.markerWidth, @options.markerHeight, true)
 
-  addBox: (cellX, cellY, options = {}) ->           @addCell SnappyBox, cellX, cellY, options
+  addBox:           (cellX, cellY, options = {}) -> @addCell SnappyBox, cellX, cellY, options
   addParallelogram: (cellX, cellY, options = {}) -> @addCell SnappyParallelogram, cellX, cellY, options
-  addDiamond: (cellX, cellY, options = {}) ->       @addCell SnappyDiamond, cellX, cellY, options
-  addCircle: (cellX, cellY, options = {}) ->        @addCell SnappyCircle, cellX, cellY, options
-  addEllipse: (cellX, cellY, options = {}) ->       @addCell SnappyEllipse, cellX, cellY, options
+  addDiamond:       (cellX, cellY, options = {}) -> @addCell SnappyDiamond, cellX, cellY, options
+  addCircle:        (cellX, cellY, options = {}) -> @addCell SnappyCircle, cellX, cellY, options
+  addEllipse:       (cellX, cellY, options = {}) -> @addCell SnappyEllipse, cellX, cellY, options
 
   addCell: (cellClass, cellX, cellY, options = {}) ->
     @cellCount = Math.max cellX + 1, @cellCount

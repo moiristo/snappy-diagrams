@@ -8,12 +8,16 @@ class SnappyEllipse extends SnappyCell
 
   xOffset: (anchor) ->
     if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
-      @spacingOffset() + @diagram.cellWidth * 0.1313
+      @spacingOffset() + @radius().x * (1 - Math.cos(Math.PI / 4))
     else
       @spacingOffset()
 
   yOffset: (anchor) ->
     if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
-      @spacingOffset() + @diagram.cellHeight * 0.1313
+      @spacingOffset() + @radius().y * (1 - Math.sin(Math.PI / 4))
     else
       @spacingOffset()
+
+  radius: ->
+    x: (@diagram.cellWidth - @diagram.options.cellSpacing) / 2
+    y: (@diagram.cellHeight - @diagram.options.cellSpacing) / 2

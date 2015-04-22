@@ -250,13 +250,9 @@
         offset += (this.diagram.cellWidth - this.diagram.cellHeight) / 2;
       }
       if (['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0) {
-        offset += this.radius() * 0.2626;
+        offset += this.radius() * (1 - Math.cos(Math.PI / 4));
       }
-      if (offset != null) {
-        return offset;
-      } else {
-        return this.spacingOffset();
-      }
+      return offset;
     };
 
     SnappyCircle.prototype.yOffset = function(anchor) {
@@ -266,13 +262,9 @@
         offset += (this.diagram.cellHeight - this.diagram.cellWidth) / 2;
       }
       if (['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0) {
-        offset += this.radius() * 0.2626;
+        offset += this.radius() * (1 - Math.sin(Math.PI / 4));
       }
-      if (offset != null) {
-        return offset;
-      } else {
-        return this.spacingOffset();
-      }
+      return offset;
     };
 
     SnappyCircle.prototype.radius = function() {
@@ -335,7 +327,7 @@
 
     SnappyEllipse.prototype.xOffset = function(anchor) {
       if (['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0) {
-        return this.spacingOffset() + this.diagram.cellWidth * 0.1313;
+        return this.spacingOffset() + this.radius().x * (1 - Math.cos(Math.PI / 4));
       } else {
         return this.spacingOffset();
       }
@@ -343,10 +335,17 @@
 
     SnappyEllipse.prototype.yOffset = function(anchor) {
       if (['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0) {
-        return this.spacingOffset() + this.diagram.cellHeight * 0.1313;
+        return this.spacingOffset() + this.radius().y * (1 - Math.sin(Math.PI / 4));
       } else {
         return this.spacingOffset();
       }
+    };
+
+    SnappyEllipse.prototype.radius = function() {
+      return {
+        x: (this.diagram.cellWidth - this.diagram.options.cellSpacing) / 2,
+        y: (this.diagram.cellHeight - this.diagram.options.cellSpacing) / 2
+      };
     };
 
     return SnappyEllipse;

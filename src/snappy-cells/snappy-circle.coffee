@@ -6,19 +6,24 @@ class SnappyCircle extends SnappyCell
 
   xOffset: (anchor) ->
     offset = @spacingOffset()
-    if @diagram.cellWidth > @diagram.cellHeight && ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right'].indexOf(anchor) >= 0
-      offset += (@diagram.cellWidth - @diagram.cellHeight ) / 2
 
-    offset += @radius() * 0.2626 if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
-    if offset? then offset else @spacingOffset()
+    if @diagram.cellWidth > @diagram.cellHeight && ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right'].indexOf(anchor) >= 0
+      offset += (@diagram.cellWidth - @diagram.cellHeight) / 2
+
+    if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
+      offset += @radius() * (1 - Math.cos(Math.PI / 4))
+
+    offset
 
   yOffset: (anchor) ->
     offset = @spacingOffset()
+
     if @diagram.cellHeight > @diagram.cellWidth && ['top-left', 'top-right', 'bottom-left', 'bottom-right', 'middle-left', 'middle-right'].indexOf(anchor) >= 0
-      offset += (@diagram.cellHeight - @diagram.cellWidth ) / 2
+      offset += (@diagram.cellHeight - @diagram.cellWidth) / 2
 
-    offset += @radius() * 0.2626 if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
-    if offset? then offset else @spacingOffset()
+    if ['top-left', 'top-right', 'bottom-left', 'bottom-right'].indexOf(anchor) >= 0
+      offset += @radius() * (1 - Math.sin(Math.PI / 4))
 
-  radius: ->
-    (Math.min(@diagram.cellWidth, @diagram.cellHeight) - @diagram.options.cellSpacing) / 2
+    offset
+
+  radius: -> (Math.min(@diagram.cellWidth, @diagram.cellHeight) - @diagram.options.cellSpacing) / 2
