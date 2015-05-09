@@ -6,6 +6,7 @@ class @SnappyDiagram
     @connectors = []
 
     defaults =
+      allowDrag: true
       width: 1000
       height: 500
       cellSpacing: 10
@@ -38,6 +39,8 @@ class @SnappyDiagram
   addConnector: (cellStart, cellEnd, options = {}) ->
     connector = new SnappyConnector(@, cellStart, cellEnd, options)
     @connectors.push connector
+    cellStart.sourceConnections.push(connector)
+    cellEnd.targetConnections.push(connector)
     connector
 
   draw: ->

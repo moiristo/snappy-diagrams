@@ -1,5 +1,5 @@
 (function(){
-  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 10 });
+  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 10, allowDrag: true });
 
   cell1 = diagram.addBox(0,0);
   cell2 = diagram.addBox(3,0);

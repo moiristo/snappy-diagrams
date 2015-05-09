@@ -15,12 +15,21 @@ class SnappyConnector
     startAnchor = @cellStart.anchorCoords startLabel
     endAnchor = @cellEnd.anchorCoords endLabel
 
+    @currentCoords = @originalCoords = { x1: startAnchor.x, y1: startAnchor.y, x2: endAnchor.x, y2: endAnchor.y }
+
     attrs = {}
     attrs.markerEnd   = @diagram.markerEnd   unless @options.style == 'line'
     attrs.markerStart = @diagram.markerStart if     @options.style == 'double'
     attrs.class = 'snappy-connector'
 
-    line = @diagram.snap.line(startAnchor.x, startAnchor.y, endAnchor.x, endAnchor.y).attr(attrs)
+    @element = @diagram.snap.line(startAnchor.x, startAnchor.y, endAnchor.x, endAnchor.y).attr(attrs)
+
+  updateCurrentCoords: ->
+    @currentCoords =
+      x1: +@element.attr('x1')
+      y1: +@element.attr('y1')
+      x2: +@element.attr('x2')
+      y2: +@element.attr('y2')
 
   toString: ->
     connector = switch @options.style

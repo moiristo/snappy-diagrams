@@ -1,5 +1,6 @@
 (function() {
   var SnappyBox, SnappyCell, SnappyCircle, SnappyConnector, SnappyDiamond, SnappyEllipse, SnappyParallelogram,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
     hasProp = {}.hasOwnProperty;
 
@@ -60,19 +61,24 @@
       this.cellX = cellX1;
       this.cellY = cellY1;
       this.options = options1 != null ? options1 : {};
+      this.moveStopHandler = bind(this.moveStopHandler, this);
+      this.moveStartHandler = bind(this.moveStartHandler, this);
+      this.moveHandler = bind(this.moveHandler, this);
       if (this.constructor === SnappyCell) {
         throw new Error("Can't instantiate abstract class SnappyCell");
       }
+      this.sourceConnections = [];
+      this.targetConnections = [];
       (base = this.options).attrs || (base.attrs = {});
       this;
     }
 
     SnappyCell.prototype.x = function() {
-      return this.cellX * this.diagram.cellWidth;
+      return this.currentX || this.cellX * this.diagram.cellWidth;
     };
 
     SnappyCell.prototype.y = function() {
-      return this.cellY * this.diagram.cellHeight;
+      return this.currentY || this.cellY * this.diagram.cellHeight;
     };
 
     SnappyCell.prototype.anchorCoords = function(anchor) {
@@ -144,9 +150,13 @@
     };
 
     SnappyCell.prototype.cellAttrs = function(className) {
-      var attrs;
+      var attrs, classes;
       attrs = this.options.attrs;
-      attrs["class"] = [this.options.attrs["class"], 'snappy-cell', className].join(' ');
+      classes = [this.options.attrs["class"], 'snappy-cell', className];
+      if (this.diagram.options.allowDrag) {
+        classes.push('draggable');
+      }
+      attrs["class"] = classes.join(' ');
       return attrs;
     };
 
@@ -169,10 +179,17 @@
       };
     };
 
+    SnappyCell.prototype.connections = function() {
+      return this.sourceConnections.concat(this.targetConnections);
+    };
+
     SnappyCell.prototype.draw = function() {
       this.element = this.drawElement();
       if (this.options.text) {
         this.element = this.diagram.snap.g(this.element, this.drawText());
+      }
+      if (this.diagram.options.allowDrag) {
+        this.element.drag(this.moveHandler, this.moveStartHandler, this.moveStopHandler);
       }
       return this.element;
     };
@@ -182,10 +199,62 @@
     };
 
     SnappyCell.prototype.drawText = function() {
-      var textElement, x, y;
-      x = this.x() + this.diagram.options.cellSpacing / 2;
-      y = this.y();
-      return textElement = this.diagram.snap.multitext(x, y, this.options.text, this.boxWidth(), this.boxHeight());
+      return this.diagram.snap.multitext(this.x() + this.diagram.options.cellSpacing / 2, this.y(), this.options.text, this.boxWidth(), this.boxHeight());
+    };
+
+    SnappyCell.prototype.moveHandler = function(dx, dy) {
+      var connector, j, k, len, len1, ref, ref1, results;
+      this.element.attr({
+        transform: "" + this.origTransform + (this.origTransform != null ? 'T' : 't') + ([dx, dy].join(','))
+      });
+      ref = this.sourceConnections;
+      for (j = 0, len = ref.length; j < len; j++) {
+        connector = ref[j];
+        connector.element.attr({
+          x1: connector.currentCoords.x1 + dx,
+          y1: connector.currentCoords.y1 + dy
+        });
+      }
+      ref1 = this.targetConnections;
+      results = [];
+      for (k = 0, len1 = ref1.length; k < len1; k++) {
+        connector = ref1[k];
+        results.push(connector.element.attr({
+          x2: connector.currentCoords.x2 + dx,
+          y2: connector.currentCoords.y2 + dy
+        }));
+      }
+      return results;
+    };
+
+    SnappyCell.prototype.moveStartHandler = function() {
+      var connector, j, len, ref;
+      this.origTransform = this.element.transform().local;
+      ref = this.connections();
+      for (j = 0, len = ref.length; j < len; j++) {
+        connector = ref[j];
+        this.diagram.snap.node.appendChild(connector.element.node);
+      }
+      return this.diagram.snap.node.appendChild(this.element.node);
+    };
+
+    SnappyCell.prototype.moveStopHandler = function() {
+      var connector, j, len, ref, results;
+      this.updateCurrentCoords();
+      ref = this.connections();
+      results = [];
+      for (j = 0, len = ref.length; j < len; j++) {
+        connector = ref[j];
+        results.push(connector.updateCurrentCoords());
+      }
+      return results;
+    };
+
+    SnappyCell.prototype.updateCurrentCoords = function() {
+      var newBBox;
+      newBBox = this.element.getBBox();
+      this.currentX = newBBox.x;
+      return this.currentY = newBBox.y;
     };
 
     SnappyCell.prototype.toString = function() {
@@ -415,11 +484,17 @@
     };
 
     SnappyConnector.prototype.draw = function() {
-      var attrs, endAnchor, endLabel, line, startAnchor, startLabel;
+      var attrs, endAnchor, endLabel, startAnchor, startLabel;
       startLabel = this.options.startAnchor || [this.verticalLabel(this.cellStart.cellY - this.cellEnd.cellY), this.horizontalLabel(this.cellStart.cellX - this.cellEnd.cellX)].join('-');
       endLabel = this.options.endAnchor || [this.verticalLabel(this.cellEnd.cellY - this.cellStart.cellY), this.horizontalLabel(this.cellEnd.cellX - this.cellStart.cellX)].join('-');
       startAnchor = this.cellStart.anchorCoords(startLabel);
       endAnchor = this.cellEnd.anchorCoords(endLabel);
+      this.currentCoords = this.originalCoords = {
+        x1: startAnchor.x,
+        y1: startAnchor.y,
+        x2: endAnchor.x,
+        y2: endAnchor.y
+      };
       attrs = {};
       if (this.options.style !== 'line') {
         attrs.markerEnd = this.diagram.markerEnd;
@@ -428,7 +503,16 @@
         attrs.markerStart = this.diagram.markerStart;
       }
       attrs["class"] = 'snappy-connector';
-      return line = this.diagram.snap.line(startAnchor.x, startAnchor.y, endAnchor.x, endAnchor.y).attr(attrs);
+      return this.element = this.diagram.snap.line(startAnchor.x, startAnchor.y, endAnchor.x, endAnchor.y).attr(attrs);
+    };
+
+    SnappyConnector.prototype.updateCurrentCoords = function() {
+      return this.currentCoords = {
+        x1: +this.element.attr('x1'),
+        y1: +this.element.attr('y1'),
+        x2: +this.element.attr('x2'),
+        y2: +this.element.attr('y2')
+      };
     };
 
     SnappyConnector.prototype.toString = function() {
@@ -459,6 +543,7 @@
       this.cells = [];
       this.connectors = [];
       defaults = {
+        allowDrag: true,
         width: 1000,
         height: 500,
         cellSpacing: 10,
@@ -536,6 +621,8 @@
       }
       connector = new SnappyConnector(this, cellStart, cellEnd, options);
       this.connectors.push(connector);
+      cellStart.sourceConnections.push(connector);
+      cellEnd.targetConnections.push(connector);
       return connector;
     };
 

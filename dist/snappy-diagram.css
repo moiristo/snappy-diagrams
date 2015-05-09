@@ -8,6 +8,9 @@
   stroke-width: 1;
   stroke: #0099FF;
 }
+.snappy-diagram .snappy-cell.draggable {
+  cursor: move;
+}
 .snappy-diagram .snappy-connector {
   stroke: #666;
   stroke-width: 2;
