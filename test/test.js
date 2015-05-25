@@ -15,7 +15,7 @@
 
   cell10 = diagram.addCircle(1,0);
   cell11 = diagram.addEllipse(0,1);
-  cell12 = diagram.addCircle(1,1, {attrs: {class: 'orphan'}});
+  cell12 = diagram.addCircle(2,1, {attrs: {class: 'orphan'}});
 
   diagram.addConnector(cell5, cell1);
   diagram.addConnector(cell5, cell2);
@@ -37,7 +37,7 @@
   cell3 = diagram.addBox(4,0);
 
   cell4 = diagram.addBox(0,2);
-  cell5 = diagram.addEllipse(2,2);
+  cell5 = diagram.addDiamond(2,2);
   cell6 = diagram.addParallelogram(4,2);
 
   cell7 = diagram.addBox(0,4);
