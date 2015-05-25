@@ -1,7 +1,22 @@
 {
   "name": "snappy-diagrams",
   "version": "0.0.1",
+  "description": "An arrows-and-boxes diagram builder using Snap.SVG",
   "author": "Reinier de Lange & Peter Leppers",
+  "license": "MIT",
+  "keywords": [
+    "diagram",
+    "graph",
+    "snap.svg",
+    "visualization"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moiristo/snappy-diagrams"
+  },
+    "bugs": {
+    "url": "https://github.com/moiristo/snappy-diagrams/issues"
+  },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-coffee": "~0.13.0",
