@@ -28,6 +28,8 @@ Load Snap.SVG and the snappy-diagrams JS and CSS:
 
 ## Usage
 
+*Take a look at the files in the `test` directory to find the implementation of the diagrams shown in the screenshots.*
+
 ### 1. Create a new diagram
 
 ```javascript
@@ -117,4 +119,27 @@ diagram.addConnector(ellipse, circle, { style: 'double' });
 ```javascript
 diagram.draw();
 ```
+
+### 5. Export your diagram
+
+You can export your diagram to PNG by calling the `export` function (supported for in modern browsers and IE10+):
+
+```javascript
+window.onload = function() {
+  document.getElementById('export-button').onclick = function(){ diagram.export() };
+};
+```
+
+### Note on Patches/Pull Requests
+
+* Fork the project.
+* Make your feature addition or bug fix.
+* Add tests for it. This is important so I don't break it in a
+  future version unintentionally.
+* Commit, do not mess with version, or history.
+* Send me a pull request. Bonus points for topic branches.
+
+### Copyright
+
+Copyright &copy; 2015 Reinier de Lange &amp; Peter Leppers. See LICENSE for details.
 

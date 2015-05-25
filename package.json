@@ -1,7 +1,7 @@
 {
   "name": "snappy-diagrams",
   "version": "0.0.1",
-  "author": "Reinier de Lange",
+  "author": "Reinier de Lange & Peter Leppers",
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-coffee": "~0.13.0",
