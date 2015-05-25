@@ -543,6 +543,7 @@
       this.cells = [];
       this.connectors = [];
       defaults = {
+        name: 'snappy-diagram',
         allowDrag: true,
         width: 1000,
         height: 500,
@@ -686,8 +687,11 @@
       return path;
     };
 
-    SnappyDiagram.prototype["export"] = function() {
-      var canvas, element, j, k, len, len1, len2, m, ref, ref1, ref2, rule, stylesheet, svg, svgImage;
+    SnappyDiagram.prototype["export"] = function(type) {
+      var canvas, element, j, k, len, len1, len2, link, m, ref, ref1, ref2, rule, stylesheet, svg, svgImage;
+      if (type == null) {
+        type = 'png';
+      }
       svg = this.snap.node.cloneNode(true);
       ref = document.styleSheets;
       for (j = 0, len = ref.length; j < len; j++) {
@@ -702,19 +706,27 @@
           }
         }
       }
-      canvas = document.createElement('canvas');
-      svgImage = new Image();
-      svgImage.src = "data:image/svg+xml;base64," + (btoa(svg.outerHTML));
-      svgImage.onload = function() {
-        var link;
-        canvas.width = svgImage.width;
-        canvas.height = svgImage.height;
-        canvas.getContext('2d').drawImage(svgImage, 0, 0);
+      if (type === 'svg') {
         link = document.createElement('a');
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'snappy-diagram.png';
-        return link.click();
-      };
+        link.href = "data:image/svg+xml;utf8," + (unescape(svg.outerHTML));
+        link.download = this.options.name + ".svg";
+        link.click();
+      } else {
+        canvas = document.createElement('canvas');
+        svgImage = new Image();
+        svgImage.src = "data:image/svg+xml;utf8," + (unescape(svg.outerHTML));
+        svgImage.onload = (function(_this) {
+          return function() {
+            canvas.width = svgImage.width;
+            canvas.height = svgImage.height;
+            canvas.getContext('2d').drawImage(svgImage, 0, 0);
+            link = document.createElement('a');
+            link.href = canvas.toDataURL('image/png');
+            link.download = _this.options.name + ".png";
+            return link.click();
+          };
+        })(this);
+      }
       return true;
     };
 

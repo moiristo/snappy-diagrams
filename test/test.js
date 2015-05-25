@@ -1,5 +1,5 @@
 (function(){
-  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 10, allowDrag: true });
+  var diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 10, allowDrag: true });
 
   cell1 = diagram.addBox(0,0);
   cell2 = diagram.addBox(3,0);
@@ -30,7 +30,7 @@
 })();
 
 (function(){
-  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 20 });
+  var diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 20 });
 
   cell1 = diagram.addBox(0,0);
   cell2 = diagram.addBox(2,0);
@@ -57,7 +57,7 @@
 })();
 
 (function(){
-  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 3 });
+  var diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 3 });
 
   cell1 = diagram.addBox(0,0, { text: 'Nedforce Informatica Specialisten' });
   cell2 = diagram.addBox(1,0, { text: 'National Aeronautics and Space Administration' });
@@ -73,14 +73,7 @@
   diagram.draw();
 
   window.onload = function() {
-    document.getElementById('export-button').onclick = function(){ diagram.export() };
+    document.getElementById('export-png-button').onclick = function(){ diagram.export() };
+    document.getElementById('export-svg-button').onclick = function(){ diagram.export('svg') };
   };
-})();
-
-(function(){
-  diagram = new SnappyDiagram({ width: 800, height: 600, boxRadius: 3, cellSpacing: 50 });
-  box1 = diagram.addBox(0,0, { text: 'Box 1' });
-  box2 = diagram.addBox(1,0, { text: 'Box 2' });
-  connector = diagram.addConnector(box1, box2, { style: 'double' });
-  diagram.draw();
 })();

@@ -6,6 +6,7 @@ class @SnappyDiagram
     @connectors = []
 
     defaults =
+      name: 'snappy-diagram'
       allowDrag: true
       width: 1000
       height: 500
@@ -67,7 +68,8 @@ class @SnappyDiagram
     path = path.marker(0, 0, height, width, (if reverse then 1 else height), width / 2)
     path
 
-  export: ->
+  export: (type = 'png') ->
+
     # Copy the svg
     svg = @snap.node.cloneNode(true)
 
@@ -78,18 +80,24 @@ class @SnappyDiagram
       for rule in stylesheet.cssRules || stylesheet.rules || []
         element.style.cssText += rule.style.cssText for element in svg.querySelectorAll(rule.selectorText)
 
-    # canvas: IE9+, btoa: IE10+
-    canvas = document.createElement 'canvas'
-    svgImage = new Image()
-    svgImage.src = "data:image/svg+xml;base64,#{btoa(svg.outerHTML)}"
-    svgImage.onload = ->
-      canvas.width = svgImage.width
-      canvas.height = svgImage.height
-      canvas.getContext('2d').drawImage(svgImage, 0, 0)
-
+    if type == 'svg'
       link = document.createElement 'a'
-      link.href = canvas.toDataURL 'image/png'
-      link.download = 'snappy-diagram.png'
+      link.href = "data:image/svg+xml;utf8,#{unescape svg.outerHTML}"
+      link.download = "#{@options.name}.svg"
       link.click()
+    else
+      # canvas: IE9+
+      canvas = document.createElement 'canvas'
+      svgImage = new Image()
+      svgImage.src = "data:image/svg+xml;utf8,#{unescape svg.outerHTML}"
+      svgImage.onload = =>
+        canvas.width = svgImage.width
+        canvas.height = svgImage.height
+        canvas.getContext('2d').drawImage(svgImage, 0, 0)
+
+        link = document.createElement 'a'
+        link.href = canvas.toDataURL 'image/png'
+        link.download = "#{@options.name}.png"
+        link.click()
 
     true

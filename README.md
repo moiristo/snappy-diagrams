@@ -40,6 +40,8 @@ diagram = new SnappyDiagram({ width: 800, height: 600 });
 *Supported options:*
 
 <dl>
+  <dt>name</dt>
+  <dd>The name of the diagram.</dd>
   <dt>width</dt>
   <dd>The diagram width (px).</dd>
   <dt>height</dt>
@@ -122,11 +124,12 @@ diagram.draw();
 
 ### 5. Export your diagram
 
-You can export your diagram to PNG by calling the `export` function (supported for in modern browsers and IE10+):
+You can export your diagram to PNG or SVG by calling the `export` function (supported in all modern browsers and IE9+):
 
 ```javascript
 window.onload = function() {
-  document.getElementById('export-button').onclick = function(){ diagram.export() };
+  document.getElementById('export-png-button').onclick = function(){ diagram.export() };
+  document.getElementById('export-svg-button').onclick = function(){ diagram.export('svg') };
 };
 ```
 
@@ -136,7 +139,7 @@ window.onload = function() {
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
   future version unintentionally.
-* Commit, do not mess with version, or history.
+* Commit, do not mess with version or history.
 * Send me a pull request. Bonus points for topic branches.
 
 ### Copyright
