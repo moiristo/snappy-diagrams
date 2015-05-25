@@ -38,7 +38,7 @@
         text: 'Ellipse 1'
       }).toString()).toBe('SnappyEllipse@1,1:Ellipse 1');
     });
-    return it('adds a connector', function() {
+    it('adds a connector', function() {
       var box1, box2, connector;
       box1 = diagram.addBox(0, 0, {
         text: 'Box 1'
@@ -50,6 +50,40 @@
         style: 'double'
       });
       return expect(connector.toString()).toBe("SnappyConnector:(" + (box1.toString()) + ")<->(" + (box2.toString()) + ")");
+    });
+    it('calculates the dimensions based on cell and row count', function() {
+      var box1, box2, box3;
+      box1 = diagram.addBox(0, 0, {
+        text: 'Box 1'
+      });
+      box2 = diagram.addBox(1, 0, {
+        text: 'Box 2'
+      });
+      box3 = diagram.addBox(0, 1, {
+        text: 'Box 3'
+      });
+      diagram.setDimensions();
+      expect(diagram.cellWidth).toBe(diagram.options.width / 2);
+      return expect(diagram.cellHeight).toBe(diagram.options.height / 2);
+    });
+    it('draws the diagram', function() {
+      var box1, box2, connector;
+      box1 = diagram.addBox(0, 0, {
+        text: 'Box 1'
+      });
+      box2 = diagram.addBox(1, 0, {
+        text: 'Box 2'
+      });
+      connector = diagram.addConnector(box1, box2, {
+        style: 'double'
+      });
+      return expect(diagram.draw()).toBe(true);
+    });
+    it('creates a triangle marker', function() {
+      return expect(diagram.triangleMarker(7, 10)).toBeTruthy();
+    });
+    return it('exports the current diagram', function() {
+      return expect(diagram["export"]()).toBeTruthy();
     });
   });
 

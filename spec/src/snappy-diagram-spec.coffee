@@ -35,3 +35,28 @@ describe 'SnappyDiagram', ->
 
     expect connector.toString()
       .toBe "SnappyConnector:(#{box1.toString()})<->(#{box2.toString()})"
+
+  it 'calculates the dimensions based on cell and row count', ->
+    box1 = diagram.addBox(0,0, text: 'Box 1')
+    box2 = diagram.addBox(1,0, text: 'Box 2')
+    box3 = diagram.addBox(0,1, text: 'Box 3')
+
+    diagram.setDimensions()
+    expect diagram.cellWidth
+      .toBe diagram.options.width / 2
+    expect diagram.cellHeight
+      .toBe diagram.options.height / 2
+
+  it 'draws the diagram', ->
+    box1 = diagram.addBox(0,0, text: 'Box 1')
+    box2 = diagram.addBox(1,0, text: 'Box 2')
+    connector = diagram.addConnector box1, box2, style: 'double'
+    expect(diagram.draw()).toBe true
+
+  it 'creates a triangle marker', ->
+    expect diagram.triangleMarker(7, 10)
+      .toBeTruthy()
+
+  it 'exports the current diagram', ->
+    expect diagram.export()
+      .toBeTruthy()

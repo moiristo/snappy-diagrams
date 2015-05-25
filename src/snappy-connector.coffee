@@ -3,7 +3,7 @@ class SnappyConnector
     @
 
   horizontalLabel: (diff) ->
-    if diff > 1 then 'left' else if diff < -1 then 'right' else 'middle'
+    if diff >= 1 then 'left' else if diff <= -1 then 'right' else 'middle'
 
   verticalLabel: (diff) ->
     if diff > 1 then 'top' else if diff < -1 then 'bottom' else 'middle'

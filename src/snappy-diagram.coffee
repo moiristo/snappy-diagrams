@@ -47,20 +47,18 @@ class @SnappyDiagram
     @setDimensions()
     @drawCells()
     @drawConnectors()
+    true
 
   setDimensions: ->
     @cellWidth = @options.width / @cellCount
     @cellHeight = @options.height / @rowCount
 
   drawCells: ->
-    @setDimensions()
     for row in @cells
       if row?
         cell.draw() for cell in row
 
-  drawConnectors: ->
-    @setDimensions()
-    connector.draw() for connector in @connectors
+  drawConnectors: -> connector.draw() for connector in @connectors
 
   triangleMarker: (width, height, reverse = false) ->
     connectorPathString = "M 0 0 L #{height} #{width / 2} L 0 #{width} z"
@@ -93,3 +91,5 @@ class @SnappyDiagram
       link.href = canvas.toDataURL 'image/png'
       link.download = 'snappy-diagram.png'
       link.click()
+
+    true

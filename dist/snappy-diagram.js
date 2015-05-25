@@ -464,9 +464,9 @@
     }
 
     SnappyConnector.prototype.horizontalLabel = function(diff) {
-      if (diff > 1) {
+      if (diff >= 1) {
         return 'left';
-      } else if (diff < -1) {
+      } else if (diff <= -1) {
         return 'right';
       } else {
         return 'middle';
@@ -629,7 +629,8 @@
     SnappyDiagram.prototype.draw = function() {
       this.setDimensions();
       this.drawCells();
-      return this.drawConnectors();
+      this.drawConnectors();
+      return true;
     };
 
     SnappyDiagram.prototype.setDimensions = function() {
@@ -639,7 +640,6 @@
 
     SnappyDiagram.prototype.drawCells = function() {
       var cell, j, len, ref, results, row;
-      this.setDimensions();
       ref = this.cells;
       results = [];
       for (j = 0, len = ref.length; j < len; j++) {
@@ -663,7 +663,6 @@
 
     SnappyDiagram.prototype.drawConnectors = function() {
       var connector, j, len, ref, results;
-      this.setDimensions();
       ref = this.connectors;
       results = [];
       for (j = 0, len = ref.length; j < len; j++) {
@@ -706,7 +705,7 @@
       canvas = document.createElement('canvas');
       svgImage = new Image();
       svgImage.src = "data:image/svg+xml;base64," + (btoa(svg.outerHTML));
-      return svgImage.onload = function() {
+      svgImage.onload = function() {
         var link;
         canvas.width = svgImage.width;
         canvas.height = svgImage.height;
@@ -716,6 +715,7 @@
         link.download = 'snappy-diagram.png';
         return link.click();
       };
+      return true;
     };
 
     return SnappyDiagram;
